@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Thread of Pride - A Mythological Tale</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Cinzel', serif;
+      background-color: #f5f5dc; /* Bege claro, pergaminho */
+      color: #3d2b1f; /* Marrom escuro */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: #fdf5e6; /* Branco Renda Antiga */
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(89, 48, 1, 0.3);
+      border: 2px solid #daa520; /* Dourado */
+    }
+
+    h1 {
+      color: #b8860b; /* Dourado escuro */
+      text-align: center;
+      font-weight: 700;
+    }
+
+    #story-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+
+    #chapter-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* CONTROLES DE ÁUDIO (CENTRALIZADO) */
+    .controls {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #speak-button {
+      background-color: #daa520;
+      color: #fdf5e6;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      display: inline-block;
+    }
+
+    #speak-button:hover {
+      background-color: #b8860b;
+    }
+
+    #choices {
+      display: grid;
+      gap: 15px;
+    }
+
+    .choice-button {
+      background-color: #f5f5dc;
+      color: #3d2b1f;
+      border: 2px solid #dcd2b4;
+      padding: 15px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 100%;
+      text-align: left;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .choice-button:hover {
+      background-color: #e9e2c9;
+      border-color: #daa520;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.7);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fdf5e6;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #daa520;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      color: #3d2b1f;
+    }
+    
+    #question-text {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+    }
+
+    .options-container div {
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    #submit-answer {
+      background-color: #daa520;
+      color: #fdf5e6;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>The Thread of Pride</h1>
+  <div id="story-container">
+    <img id="chapter-image" src="" alt="Scene Image">
+    <p id="story-text"></p>
+    <div class="controls">
+      <button id="speak-button">Listen to Narration 🔊</button>
+    </div>
+    <div id="choices"></div>
+  </div>
+</div>
+
+<div id="question-modal" class="modal">
+  <div class="modal-content">
+    <p id="question-text"></p>
+    <div id="options-container" class="options-container"></div>
+    <button id="submit-answer">Submit Answer</button>
+  </div>
+</div>
+
+<script>
+  const storyData = {
+    'start': {
+      text: "You are Elara, a young weaver from Lydia and a friend of Arachne, whose talent with the loom is said to be a divine gift. However, Arachne's pride grows daily, and she has just proclaimed that her skill surpasses even that of the goddess Athena. Immediately, an old woman appears and advises her to be humble. Arachne laughs, and the old woman reveals herself to be Athena, furious. A challenge is issued. What do you do?",
+      choices: [
+        { text: "Advise Arachne to apologize and withdraw the challenge.", nextChapter: 'path_caution' },
+        { text: "Encourage Arachne, believing in her incredible skill.", nextChapter: 'path_pride' }
+      ],
+      question: {
+        prompt: "What is Arachne's primary flaw that sets the story in motion?",
+        options: [
+          "Greed",
+          "Envy",
+          "Sloth",
+          "Pride"
+        ],
+        correctAnswerIndex: 3 
+      }
+    },
+    'path_caution': {
+      text: "You approach and wisely ask your friend to reconsider. The crowd supports your caution. Arachne, however, feels betrayed but accepts the competition with a flash of anger in her eyes. Athena gives you a warning look. The theme of Arachne's tapestry must be chosen carefully. What should she weave?",
+      choices: [
+        { text: "A tapestry showing the beauty of the mortal world.", nextChapter: 'end_respect' },
+        { text: "A tapestry praising the wisdom of the gods.", nextChapter: 'end_broken' }
+      ],
+      question: {
+        prompt: "How did Athena appear before revealing her true form?",
+        options: [
+          "As a bird",
+          "As a young maiden",
+          "As an old woman",
+          "As a priest"
+        ],
+        correctAnswerIndex: 2
+      }
+    },
+    'path_pride': {
+      text: "You support your friend, whispering words of encouragement. Arachne's pride ignites with your support. She turns to Athena with a challenging smile. The goddess of wisdom narrows her eyes, the mortal's offense hanging in the air. The competition begins under great tension. What theme should Arachne choose for her tapestry?",
+      choices: [
+        { text: "A tapestry showing the flaws and follies of the Olympian gods.", nextChapter: 'end_transformation' },
+        { text: "A tapestry of pure abstract beauty, to focus only on technique.", nextChapter: 'end_respect' }
+      ],
+      question: {
+        prompt: "What is your relationship with Arachne in the story?",
+        options: [
+          "Sister",
+          "Rival",
+          "Master",
+          "Friend"
+        ],
+        correctAnswerIndex: 3
+      }
+    },
+    'end_broken': {
+      text: "Arachne weaves a tapestry praising the gods, but her heart is not in the work. The piece is technically perfect, but it lacks the passion that made her famous. Athena looks at it with disdain, declaring that art without a soul is not art at all. With a touch, she shatters Arachne's loom, leaving her with her talent, but with her artistic spirit broken. (The End)",
+      choices: [],
+      question: null
+    },
+    'end_respect': {
+      text: "Arachne weaves a masterpiece that celebrates the beauty of the world and human skill, without disrespecting the gods. Her technique is so flawless that even Athena falls silent, in awe. Though she doesn't admit defeat, the goddess acknowledges the mortal's extraordinary talent. She warns her about pride but allows Arachne to keep her form and her art. The lesson has been learned. (The End)",
+      choices: [],
+      question: null
+    },
+    'end_transformation': {
+      text: "Driven by pride, Arachne weaves a tapestry depicting the gods in their most embarrassing and foolish moments. The work is a masterpiece of skill, but also of insolence. Enraged by the offense, Athena tears the tapestry and touches Arachne's forehead. Arachne begins to shrink and transform, becoming the first spider, condemned to weave forever as a reminder of her pride. (The End)",
+      choices: [],
+      question: null
+    }
+  };
+
+  // MAPA DE ÁUDIO
+  const audioMap = {
+    'start': 'audio/thread_start.mp3',
+    'path_caution': 'audio/thread_caution.mp3',
+    'path_pride': 'audio/thread_pride.mp3',
+    'end_broken': 'audio/thread_broken_end.mp3',
+    'end_respect': 'audio/thread_respect_end.mp3',
+    'end_transformation': 'audio/thread_transformation_end.mp3'
+  };
+
+  const imageMap = {
+    'start': 'images/TP1.jpg',
+    'path_caution': 'images/TP5.jpg',
+    'path_pride': 'images/TP2.jpg',
+    'end_respect': 'images/TP7.jpg',
+    'end_broken': 'images/TP4.jpg',
+    'end_transformation': 'images/TP6.jpg'
+  };
+
+  const storyTextElement = document.getElementById('story-text');
+  const choicesElement = document.getElementById('choices');
+  const speakButton = document.getElementById('speak-button');
+  const questionModal = document.getElementById('question-modal');
+  const questionTextElement = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const submitAnswerButton = document.getElementById('submit-answer');
+  const imageElement = document.getElementById('chapter-image');
+
+  let currentAudio = new Audio();
+  currentAudio.volume = 0.8;
+  let activeChapterKey = 'start';
+
+  function renderChapter(chapterKey) {
+    const chapter = storyData[chapterKey];
+    if (!chapter) return;
+
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    speakButton.innerText = 'Listen to Narration 🔊';
+
+    storyTextElement.innerText = chapter.text;
+    choicesElement.innerHTML = '';
+    
+    const imagePath = imageMap[chapterKey];
+    if (imagePath) {
+      imageElement.src = imagePath;
+      imageElement.style.display = 'block';
+    } else {
+      imageElement.style.display = 'none';
+    }
+
+    activeChapterKey = chapterKey;
+
+    if (chapter.choices && chapter.choices.length > 0) {
+      chapter.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.innerText = choice.text;
+        button.classList.add('choice-button');
+        button.onclick = () => handleChoice(choice.nextChapter);
+        choicesElement.appendChild(button);
+      });
+      speakButton.style.display = 'inline-block';
+    } else {
+      // CORREÇÃO: Botão de áudio visível no final
+      const restartButton = document.createElement('button');
+      restartButton.innerText = 'Restart';
+      restartButton.classList.add('choice-button');
+      restartButton.onclick = () => renderChapter('start');
+      choicesElement.appendChild(restartButton);
+      speakButton.style.display = 'inline-block';
+    }
+  }
+
+  function handleChoice(nextChap) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    
+    const nextChapter = nextChap;
+    const chapter = storyData[activeChapterKey];
+    const question = chapter.question;
+
+    if (question) {
+      questionTextElement.innerText = question.prompt;
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        optionsContainer.innerHTML += `
+          <div>
+            <input type="radio" id="option${index}" name="answer" value="${index}">
+            <label for="option${index}">${option}</label>
+          </div>
+        `;
+      });
+      
+      submitAnswerButton.dataset.next = nextChapter;
+      questionModal.style.display = 'flex';
+    } else {
+      renderChapter(nextChapter);
+    }
+  }
+
+  submitAnswerButton.onclick = () => {
+    const currentQuestion = storyData[activeChapterKey].question;
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    const nextChapter = submitAnswerButton.dataset.next;
+
+    if (!selectedOption) {
+      alert('Please select an answer.');
+      return;
+    }
+
+    if (parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex) {
+      questionModal.style.display = 'none';
+      renderChapter(nextChapter);
+    } else {
+      alert('Incorrect answer. Please read the text again and retry.');
+      questionModal.style.display = 'none';
+    }
+  };
+
+  speakButton.addEventListener('click', () => {
+    const audioFile = audioMap[activeChapterKey];
+    if (audioFile) {
+      if (currentAudio.src.indexOf(audioFile) === -1 || currentAudio.paused) {
+        currentAudio.src = audioFile;
+        currentAudio.play();
+        speakButton.innerText = 'Pause Narration ⏸️';
+      } else {
+        currentAudio.pause();
+        speakButton.innerText = 'Listen to Narration 🔊';
+      }
+    } else {
+      alert('Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder.');
+    }
+  });
+
+  currentAudio.onended = () => {
+    speakButton.innerText = 'Listen to Narration 🔊';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == questionModal) {
+      questionModal.style.display = "none";
+    }
+  }
+
+  // Start the story
+  renderChapter('start');
+</script>
+</body>
+</html>

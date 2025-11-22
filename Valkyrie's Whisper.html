@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Valkyrie's Whisper - A Mythological Adventure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+    body {
+      font-family: 'Cinzel', serif;
+      background-color: #2d1a1a; /* Vermelho Escuro (Sangue seco/Madeira escura) */
+      color: #E0E0E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: #4a2a2a; /* Marrom Avermelhado */
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(255, 215, 0, 0.3); /* Brilho Dourado */
+      border: 1px solid #6a4a4a;
+    }
+
+    h1 {
+      color: #FFD700; /* Ouro */
+      text-align: center;
+      font-weight: 700;
+    }
+
+    #story-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+
+    #chapter-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #FFD700;
+    }
+
+    /* CONTROLES DE ÁUDIO (CENTRALIZADO) */
+    .controls {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #speak-button {
+      background-color: #FFD700;
+      color: #2d1a1a;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    #speak-button:hover {
+      background-color: #eec400;
+    }
+
+    #choices {
+      display: grid;
+      gap: 15px;
+    }
+
+    .choice-button {
+      background-color: #6a4a4a;
+      color: #E0E0E0;
+      border: 2px solid #8a6a6a;
+      padding: 15px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 100%;
+      text-align: left;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .choice-button:hover {
+      background-color: #7a5a5a;
+      border-color: #FFD700;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #4a2a2a;
+      margin: auto;
+      padding: 30px;
+      border: 1px solid #FFD700;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      color: #E0E0E0;
+    }
+    
+    #question-text {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #FFD700;
+    }
+
+    .options-container div {
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: #2d1a1a;
+      border-radius: 5px;
+    }
+    
+    .options-container label {
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #submit-answer {
+      background-color: #FFD700;
+      color: #2d1a1a;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    
+    #submit-answer:hover {
+        background-color: #eec400;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>The Valkyrie's Whisper</h1>
+  <div id="story-container">
+    <img id="chapter-image" src="" alt="Scene Image">
+    <p id="story-text"></p>
+    <div class="controls">
+      <button id="speak-button">Listen to Narration 🔊</button>
+    </div>
+    <div id="choices"></div>
+  </div>
+</div>
+
+<div id="question-modal" class="modal">
+  <div class="modal-content">
+    <p id="question-text"></p>
+    <div id="options-container" class="options-container"></div>
+    <button id="submit-answer">Submit Answer</button>
+  </div>
+</div>
+
+<script>
+  const storyData = {
+    'start': {
+      text: "You have died in battle and a Valkyrie has brought you to Valhalla. Odin's hall is full of feasting and fighting. But you are new and unknown. A Valkyrie approaches you. 'To earn your place, you must prove your worth,' she whispers. 'Odin sees all. Choose your challenge.'",
+      choices: [
+        { text: "Challenge the strongest warrior in the hall to a duel.", nextChapter: 'path_duel' },
+        { text: "Join a group of warriors planning a hunt for a great beast in Odin's forest.", nextChapter: 'path_hunt' }
+      ],
+      question: {
+        prompt: "Where are you at the beginning of the story?",
+        options: ["Valhalla", "Midgard", "Jotunheim", "Asgard"],
+        correctAnswerIndex: 0
+      }
+    },
+    'path_duel': {
+      text: "You challenge a huge warrior named Hrolf. He laughs and accepts. The hall watches as you fight. Hrolf is very strong, but also very proud. You are quicker and see an opportunity. How do you prove your skill?",
+      choices: [
+        { text: "Propose a challenge of skill, like archery, instead of a fight.", nextChapter: 'end_respected' },
+        { text: "Use a clever trick to make him drop his weapon.", nextChapter: 'end_shamed' }
+      ],
+      question: {
+        prompt: "What is your main advantage against Hrolf?",
+        options: [
+          "You have a better weapon.",
+          "You are stronger than him.",
+          "You have magic on your side.",
+          "You are quicker than him."
+        ],
+        correctAnswerIndex: 3
+      }
+    },
+    'path_hunt': {
+      text: "You join a hunt for a magical boar. Your group corners the boar near a cliff edge. The beast is fierce and could easily push someone off. The other warriors prepare for a direct, reckless charge. What is your strategy?",
+      choices: [
+        { text: "Use your shield to protect the most aggressive warrior.", nextChapter: 'end_forgotten' },
+        { text: "Create a loud diversion to lure the boar away from the cliff.", nextChapter: 'end_clever' }
+      ],
+      question: {
+        prompt: "What is the main danger at the cliff edge?",
+        options: [
+          "The other warriors are cowards.",
+          "The cliff could collapse.",
+          "The boar could push someone off the cliff.",
+          "The boar is magical."
+        ],
+        correctAnswerIndex: 2
+      }
+    },
+    'end_shamed': {
+      text: "Your trick works, but Hrolf sees it as an insult, not a clever move. Enraged, he ignores the rules of the duel and attacks with true anger. He overpowers you and breaks your weapon. The hall laughs at your dishonor. You are shamed, and the Valkyrie turns away. (A Bad End)",
+      choices: [],
+      question: null
+    },
+    'end_forgotten': {
+      text: "Your selfless act saves another warrior, but you are injured in the process. Your bravery is noted, but it was a follower's bravery, not a leader's. You are just another hero in a hall full of them. Your name is not sung any louder than the others. (A Neutral End)",
+      choices: [],
+      question: null
+    },
+    'end_clever': {
+      text: "Your strategy works. You defeat your challenge using your mind. The warriors murmur in surprise, but Odin, watching from his throne, smiles. He values a sharp mind as much as a strong arm. The Valkyrie nods at you. Your cunning has earned you a place of note. (A Good End)",
+      choices: [],
+      question: null
+    },
+    'end_respected': {
+      text: "Your proposal is unusual, but Hrolf agrees. You compete in archery and axe-throwing. You do not win every event, but you show great skill and honor. The warriors, and Hrolf himself, raise their horns to you. You have earned true respect, which is harder to win than a simple fight. (A Great End)",
+      choices: [],
+      question: null
+    }
+  };
+
+  // --- MAPA DE ÁUDIO ---
+  const audioMap = {
+    'start': 'audio/valkyrie_start.mp3',
+    'path_duel': 'audio/valkyrie_duel.mp3',
+    'path_hunt': 'audio/valkyrie_hunt.mp3',
+    'end_shamed': 'audio/valkyrie_shamed_end.mp3',
+    'end_forgotten': 'audio/valkyrie_forgotten_end.mp3',
+    'end_clever': 'audio/valkyrie_clever_end.mp3',
+    'end_respected': 'audio/valkyrie_respected_end.mp3'
+  };
+
+  const imageMap = {
+    'start': 'images/VH1.jpg',
+    'path_duel': 'images/VH2.jpg',
+    'path_hunt': 'images/VH5.jpg',
+    'end_respected': 'images/VH3.jpg',
+    'end_shamed': 'images/VH4.jpg',
+    'end_clever': 'images/VH6.jpg',
+    'end_forgotten': 'images/VH7.jpg'
+  };
+
+  const storyTextElement = document.getElementById('story-text');
+  const choicesElement = document.getElementById('choices');
+  const speakButton = document.getElementById('speak-button');
+  const questionModal = document.getElementById('question-modal');
+  const questionTextElement = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const submitAnswerButton = document.getElementById('submit-answer');
+  const imageElement = document.getElementById('chapter-image');
+
+  let currentAudio = new Audio();
+  currentAudio.volume = 0.8;
+  let activeChapterKey = 'start';
+
+  function renderChapter(chapterKey) {
+    const chapter = storyData[chapterKey];
+    if (!chapter) return;
+
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    speakButton.innerText = 'Listen to Narration 🔊';
+
+    storyTextElement.innerText = chapter.text;
+    choicesElement.innerHTML = '';
+    
+    const imagePath = imageMap[chapterKey];
+    if (imagePath) {
+      imageElement.src = imagePath;
+      imageElement.style.display = 'block';
+    } else {
+      imageElement.style.display = 'none';
+    }
+
+    activeChapterKey = chapterKey;
+
+    if (chapter.choices && chapter.choices.length > 0) {
+      chapter.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.innerText = choice.text;
+        button.classList.add('choice-button');
+        button.onclick = () => handleChoice(choice.nextChapter);
+        choicesElement.appendChild(button);
+      });
+      speakButton.style.display = 'inline-block';
+    } else {
+      const restartButton = document.createElement('button');
+      restartButton.innerText = 'Restart';
+      restartButton.classList.add('choice-button');
+      restartButton.onclick = () => renderChapter('start');
+      choicesElement.appendChild(restartButton);
+      speakButton.style.display = 'inline-block';
+    }
+  }
+
+  function handleChoice(nextChap) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    
+    const nextChapter = nextChap;
+    const chapter = storyData[activeChapterKey];
+    const question = chapter.question;
+
+    if (question) {
+      questionTextElement.innerText = question.prompt;
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        optionsContainer.innerHTML += `
+          <div>
+            <input type="radio" id="option${index}" name="answer" value="${index}">
+            <label for="option${index}">${option}</label>
+          </div>
+        `;
+      });
+      
+      submitAnswerButton.dataset.next = nextChapter;
+      questionModal.style.display = 'flex';
+    } else {
+      renderChapter(nextChapter);
+    }
+  }
+
+  submitAnswerButton.onclick = () => {
+    const currentQuestion = storyData[activeChapterKey].question;
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    const nextChapter = submitAnswerButton.dataset.next;
+
+    if (!selectedOption) {
+      alert('Please select an answer.');
+      return;
+    }
+
+    if (parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex) {
+      questionModal.style.display = 'none';
+      renderChapter(nextChapter);
+    } else {
+      alert('Incorrect answer. Please read the text again and retry.');
+      questionModal.style.display = 'none';
+    }
+  };
+
+  speakButton.addEventListener('click', () => {
+    const audioFile = audioMap[activeChapterKey];
+    if (audioFile) {
+      if (currentAudio.src.indexOf(audioFile) === -1 || currentAudio.paused) {
+        currentAudio.src = audioFile;
+        currentAudio.play();
+        speakButton.innerText = 'Pause Narration ⏸️';
+      } else {
+        currentAudio.pause();
+        speakButton.innerText = 'Listen to Narration 🔊';
+      }
+    } else {
+      alert('Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder.');
+    }
+  });
+
+  currentAudio.onended = () => {
+    speakButton.innerText = 'Listen to Narration 🔊';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == questionModal) {
+      questionModal.style.display = "none";
+    }
+  }
+
+  // Start the story
+  renderChapter('start');
+</script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Serpent's Coil - A Mythological Adventure</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+
+      body {
+        font-family: "Cinzel", serif;
+        background-color: #2a1a2a; /* Dark purple */
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background-color: #3a2a3a; /* Lighter purple */
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 25px rgba(238, 130, 238, 0.2); /* Violet glow */
+        border: 1px solid #4a3a4a;
+      }
+
+      h1 {
+        color: #ee82ee; /* Violet */
+        text-align: center;
+        font-weight: 700;
+      }
+
+      #story-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-align: justify;
+      }
+
+      /* CORREÇÃO: Centralização do botão */
+      .controls {
+        text-align: center;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
+      #speak-button {
+        background-color: #ee82ee;
+        color: #2a1a2a;
+        border: none;
+        padding: 10px 20px;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block;
+      }
+
+      #speak-button:hover {
+        background-color: #da70d6;
+      }
+
+      #choices {
+        display: grid;
+        gap: 15px;
+      }
+
+      .choice-button {
+        background-color: #4a3a4a;
+        color: #e0e0e0;
+        border: 2px solid #6a5a6a;
+        padding: 15px;
+        font-family: "Cinzel", serif;
+        font-size: 1.1em;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .choice-button:hover {
+        background-color: #5a4a5a;
+        border-color: #ee82ee;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #3a2a3a;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #ee82ee;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        color: #e0e0e0;
+      }
+
+      #question-text {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+
+      .options-container div {
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      #submit-answer {
+        background-color: #ee82ee;
+        color: #2a1a2a;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        margin-top: 20px;
+      }
+
+      #chapter-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>The Serpent's Coil</h1>
+      <div id="story-container">
+        <img id="chapter-image" src="" alt="Scene Image" />
+        <p id="story-text"></p>
+        <div class="controls">
+          <button id="speak-button">Listen to Narration 🔊</button>
+        </div>
+        <div id="choices"></div>
+      </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+      <div class="modal-content">
+        <p id="question-text"></p>
+        <div id="options-container" class="options-container"></div>
+        <button id="submit-answer">Submit Answer</button>
+      </div>
+    </div>
+
+    <script>
+      const storyData = {
+        start: {
+          text: "You are a hero of Asgard. The magical chain, Gleipnir, that holds the great wolf Fenrir is weakening. To reforge it, you need a scale from Jörmungandr, the World Serpent. You stand at the shore of the great ocean where the serpent sleeps. The water is dark and cold. How do you get the serpent's attention?",
+          choices: [
+            {
+              text: "Call its name with a magical horn given to you by Odin.",
+              nextChapter: "path_horn",
+            },
+            {
+              text: "Offer a giant ox head as bait, as Thor once did.",
+              nextChapter: "path_bait",
+            },
+          ],
+          question: {
+            prompt: "What do you need to reforge the chain Gleipnir?",
+            options: [
+              "A tooth from a dragon.",
+              "A feather from a griffin.",
+              "A scale from Jörmungandr.", // Index 2
+              "A tear from a giant.",
+            ],
+            correctAnswerIndex: 2, // CORRIGIDO
+          },
+        },
+        path_horn: {
+          text: "You blow the horn. The sound travels deep into the water. A giant eye, as big as a shield, opens in the dark water. The World Serpent rises. It is not angry, but it is curious. 'Why do you wake me, little one?' its voice sounds like the deep ocean.",
+          choices: [
+            {
+              text: "Explain your noble quest and ask for its help.",
+              nextChapter: "end_wisdom",
+            },
+            {
+              text: "Demand a scale as a tribute to the gods of Asgard.",
+              nextChapter: "end_pride",
+            },
+          ],
+          question: {
+            prompt:
+              "How does the World Serpent react when you wake it with the horn?",
+            options: [
+              "It is angry and attacks you.",
+              "It is scared and hides.",
+              "It is curious and speaks to you.", // Index 2
+              "It ignores you completely.",
+            ],
+            correctAnswerIndex: 2, // CORRIGIDO
+          },
+        },
+        path_bait: {
+          text: "You throw the giant ox head into the water. Soon, there is a great splash. The World Serpent rises, and it has taken the bait. It is very angry. It fights and thrashes in the water. You must be very careful.",
+          choices: [
+            {
+              text: "Try to cut a scale from its body while it is fighting.",
+              nextChapter: "end_pride",
+            },
+            {
+              text: "Use a magic rope to calm the serpent before you ask.",
+              nextChapter: "end_wisdom",
+            },
+          ],
+          question: {
+            prompt: "What happens when you use the ox head as bait?",
+            options: [
+              "The serpent is happy and gives you a gift.",
+              "The serpent is angry and fights.", // Index 1
+              "Another sea monster comes instead.",
+              "The serpent does not appear.",
+            ],
+            correctAnswerIndex: 1, // CORRIGIDO
+          },
+        },
+        end_pride: {
+          text: "You try to use force or show pride. The World Serpent is a child of Loki and is very powerful. It sees your actions as a challenge. With a mighty whip of its tail, it creates a giant wave that throws you far away. You have failed. Fenrir's chain will break, and Ragnarok will come sooner.",
+          choices: [],
+          question: null,
+        },
+        end_wisdom: {
+          text: "You show respect and wisdom. The serpent listens to your quest. It understands the need for balance. 'The wolf must stay chained for now,' it says. It gives you one of its giant scales. You return to Asgard a hero. You have delayed Ragnarok and protected the nine realms.",
+          choices: [],
+          question: null,
+        },
+      };
+
+      // --- MAPAS ---
+      const audioMap = {
+        start: "audio/serpent_start.mp3",
+        path_horn: "audio/serpent_horn.mp3",
+        path_bait: "audio/serpent_bait.mp3",
+        end_pride: "audio/serpent_pride_end.mp3",
+        end_wisdom: "audio/serpent_wisdom_end.mp3",
+      };
+
+      const imageMap = {
+        start: "images/SP1.jpg",
+        path_horn: "images/SP2.jpg",
+        path_bait: "images/SP6.jpg",
+        end_pride: "images/SP4.jpg",
+        end_wisdom: "images/SP8.jpg",
+      };
+
+      // --- VARIÁVEIS E INICIALIZAÇÃO ---
+      const storyTextElement = document.getElementById("story-text");
+      const choicesElement = document.getElementById("choices");
+      const speakButton = document.getElementById("speak-button");
+      const questionModal = document.getElementById("question-modal");
+      const questionTextElement = document.getElementById("question-text");
+      const optionsContainer = document.getElementById("options-container");
+      const submitAnswerButton = document.getElementById("submit-answer");
+      const imageElement = document.getElementById("chapter-image");
+
+      let currentAudio = new Audio();
+      currentAudio.volume = 0.8;
+
+      let chosenPath = "";
+      let activeChapterKey = "start";
+
+      function renderChapter(chapterKey) {
+        const chapter = storyData[chapterKey];
+        if (!chapter) {
+          console.error("Chapter not found:", chapterKey);
+          return;
+        }
+
+        // Reseta áudio ao mudar de capítulo
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        speakButton.innerText = "Listen to Narration 🔊";
+
+        storyTextElement.innerText = chapter.text;
+        choicesElement.innerHTML = "";
+        imageElement.src = imageMap[chapterKey] || "";
+        imageElement.style.display = imageMap[chapterKey] ? "block" : "none";
+
+        activeChapterKey = chapterKey;
+
+        if (chapter.choices && chapter.choices.length > 0) {
+          chapter.choices.forEach((choice) => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.classList.add("choice-button");
+            button.onclick = () => handleChoice(chapterKey, choice.nextChapter);
+            choicesElement.appendChild(button);
+          });
+          speakButton.style.display = "inline-block";
+        } else {
+          // CORREÇÃO: Finais devem mostrar o botão de áudio
+          const restartButton = document.createElement("button");
+          restartButton.innerText = "Restart";
+          restartButton.classList.add("choice-button");
+          restartButton.onclick = () => renderChapter("start");
+          choicesElement.appendChild(restartButton);
+          speakButton.style.display = "inline-block"; // CORRIGIDO
+        }
+      }
+
+      function handleChoice(chapterKey, nextChapter) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        chosenPath = nextChapter;
+        activeChapterKey = chapterKey;
+        const chapter = storyData[chapterKey];
+        const question = chapter.question;
+
+        if (question) {
+          questionTextElement.innerText = question.prompt;
+          optionsContainer.innerHTML = "";
+          question.options.forEach((option, index) => {
+            optionsContainer.innerHTML += `
+                        <div>
+                            <input type="radio" id="option${index}" name="answer" value="${index}">
+                            <label for="option${index}">${option}</label>
+                        </div>
+                    `;
+          });
+          questionModal.style.display = "flex";
+        } else {
+          renderChapter(chosenPath);
+        }
+      }
+
+      submitAnswerButton.onclick = () => {
+        const currentQuestionKey = activeChapterKey;
+        if (!currentQuestionKey) return;
+
+        const currentQuestion = storyData[currentQuestionKey].question;
+        const selectedOption = document.querySelector(
+          'input[name="answer"]:checked'
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer.");
+          return;
+        }
+
+        if (
+          parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex
+        ) {
+          questionModal.style.display = "none";
+          renderChapter(chosenPath);
+        } else {
+          alert("Incorrect answer. Please read the text again and retry.");
+          questionModal.style.display = "none";
+        }
+      };
+
+      speakButton.addEventListener("click", () => {
+        const audioFile = audioMap[activeChapterKey];
+        if (audioFile) {
+          if (
+            currentAudio.src.indexOf(audioFile) === -1 ||
+            currentAudio.paused
+          ) {
+            currentAudio.src = audioFile;
+            currentAudio.play();
+            speakButton.innerText = "Pause Narration ⏸️";
+          } else {
+            currentAudio.pause();
+            speakButton.innerText = "Listen to Narration 🔊";
+          }
+        } else {
+          alert(
+            "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+          );
+        }
+      });
+
+      currentAudio.onended = () => {
+        speakButton.innerText = "Listen to Narration 🔊";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == questionModal) {
+          questionModal.style.display = "none";
+        }
+      };
+
+      // Start the story
+      renderChapter("start");
+    </script>
+  </body>
+</html>

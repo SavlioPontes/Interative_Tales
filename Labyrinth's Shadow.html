@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Labyrinth's Shadow - A Mythological Adventure</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+
+      body {
+        font-family: "Cinzel", serif;
+        background-color: #2a1a1a; /* Dark brown for a more earthy, stone feel */
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background-color: #3a2a2a;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 25px rgba(255, 140, 0, 0.2);
+        border: 1px solid #4a3a3a;
+      }
+
+      h1 {
+        color: #ff8c00; /* Dark Orange */
+        text-align: center;
+        font-weight: 700;
+      }
+
+      #story-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-align: justify;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      #speak-button {
+        background-color: #ff8c00;
+        color: #2a1a1a;
+        border: none;
+        padding: 10px 20px;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block; /* Ajuda na centralização */
+      }
+
+      #speak-button:hover {
+        background-color: #e07b00;
+      }
+
+      #choices {
+        display: grid;
+        gap: 15px;
+      }
+
+      .choice-button {
+        background-color: #4a3a3a;
+        color: #e0e0e0;
+        border: 2px solid #6a5a5a;
+        padding: 15px;
+        font-family: "Cinzel", serif;
+        font-size: 1.1em;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .choice-button:hover {
+        background-color: #5a4a4a;
+        border-color: #ff8c00;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #3a2a2a;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #ff8c00;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        color: #e0e0e0;
+      }
+
+      #question-text {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+
+      .options-container div {
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      #submit-answer {
+        background-color: #ff8c00;
+        color: #2a1a1a;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        margin-top: 20px;
+      }
+
+      #chapter-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>The Labyrinth's Shadow</h1>
+      <div id="story-container">
+        <img id="chapter-image" src="" alt="Scene Image" />
+        <p id="story-text"></p>
+        <div class="controls">
+          <button id="speak-button">Listen to Narration 🔊</button>
+        </div>
+        <div id="choices"></div>
+      </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+      <div class="modal-content">
+        <p id="question-text"></p>
+        <div id="options-container" class="options-container"></div>
+        <button id="submit-answer">Submit Answer</button>
+      </div>
+    </div>
+
+    <script>
+      const storyData = {
+        start: {
+          text: "You are Theseus, a hero from Athens. You have come to Crete to stop a great evil: the Minotaur, a monster with the body of a man and the head of a bull. It lives in a giant maze called the Labyrinth. King Minos of Crete leads you to the entrance. Princess Ariadne secretly meets you. 'Take this,' she whispers, giving you a ball of thread and a sword. 'One is for the path, the other for the beast.' What do you do?",
+          choices: [
+            {
+              text: "Rely on the magic thread to guide you.",
+              nextChapter: "path_thread",
+            },
+            {
+              text: "Trust your own strength and skill to find the way.",
+              nextChapter: "path_strength",
+            },
+          ],
+          question: {
+            prompt: "What is the monster in the Labyrinth called?",
+            options: [
+              "The Cyclops",
+              "The Minotaur",
+              "The Hydra",
+              "The Chimera",
+            ],
+            correctAnswerIndex: 1, // Corrigido para index
+          },
+        },
+        path_thread: {
+          text: "You tie one end of the thread to the entrance and walk into the darkness. The maze is confusing, with many wrong turns. But the thread is a perfect guide. It leads you deeper and deeper into the maze. Soon, you hear a loud roar. You follow the sound and arrive in a large, open room. The Minotaur is there. It is huge and angry. It sees you and prepares to attack.",
+          choices: [
+            {
+              text: "Fight the Minotaur head-on with your sword.",
+              nextChapter: "end_hero",
+            },
+            {
+              text: "Use the room's space to tire the monster out before you strike.",
+              nextChapter: "end_smart_hero",
+            },
+          ],
+          question: {
+            prompt: "What item helps you find your way through the Labyrinth?",
+            options: [
+              "A map",
+              "A magic compass",
+              "A ball of thread",
+              "A torch",
+            ],
+            correctAnswerIndex: 2, // Corrigido para index
+          },
+        },
+        path_strength: {
+          text: "You believe the thread is a trick. You enter the Labyrinth with only your sword and your courage. You mark the walls with a rock to remember your path. The maze is very difficult. You get lost many times. You are tired and thirsty, but you do not give up. After a long time, you hear the Minotaur's roar. You follow the sound and find its room. The beast is surprised to see you. It has been a long time since anyone has come so far without help.",
+          choices: [
+            {
+              text: "Use your tiredness to trick the monster into a trap.",
+              nextChapter: "end_clever_escape",
+            },
+            {
+              text: "Attack immediately, using your anger to fuel your strength.",
+              nextChapter: "end_lost_hero",
+            },
+          ],
+          question: {
+            prompt: "How do you try to find your way without the thread?",
+            options: [
+              "You follow the wind.",
+              "You look at the stars.",
+              "You drop breadcrumbs.",
+              "You mark the walls.",
+            ],
+            correctAnswerIndex: 3, // Corrigido para index
+          },
+        },
+        end_hero: {
+          text: "You charge at the Minotaur with a brave cry. The fight is difficult. The monster is strong, but you are quick. You dodge its horns and strike with Ariadne's sword. Finally, you defeat the beast. You follow the thread back to the entrance, where Ariadne is waiting. You are a true hero.",
+          choices: [],
+          question: null,
+        },
+        end_smart_hero: {
+          text: "You do not attack right away. You run and dodge, letting the Minotaur chase you. The big monster gets tired very quickly. When it is slow and breathing hard, you attack. The fight is short. You win easily. You follow the thread back out of the maze. Ariadne smiles. 'You are brave and smart,' she says. You have saved your people.",
+          choices: [],
+          question: null,
+        },
+        end_clever_escape: {
+          text: "You look tired and weak on purpose. The Minotaur thinks you are an easy target and charges carelessly. You jump out of the way, and the monster crashes into a weak wall. The wall falls down, trapping the Minotaur under heavy rocks. You did not kill it, but you have stopped it. You find your way out of the maze after many days. You are a clever survivor.",
+          choices: [],
+          question: null,
+        },
+        end_lost_hero: {
+          text: "Your anger makes you strong, but careless. You attack the Minotaur without a plan. The monster is more powerful in its home. It hits you with its horns, and you are badly hurt. You are able to escape the room, but you cannot defeat the beast. You are now lost in the Labyrinth forever, another victim of the monster. Your mission has failed.",
+          choices: [],
+          question: null,
+        },
+      };
+
+      // --- MAPAS ---
+      const audioMap = {
+        start: "audio/labyrinth_start.mp3",
+        path_thread: "audio/labyrinth_thread.mp3",
+        path_strength: "audio/labyrinth_strength.mp3",
+        end_hero: "audio/labyrinth_hero_end.mp3",
+        end_smart_hero: "audio/labyrinth_smart_end.mp3",
+        end_clever_escape: "audio/labyrinth_clever_end.mp3",
+        end_lost_hero: "audio/labyrinth_lost_end.mp3",
+      };
+
+      const imageMap = {
+        start: "images/TS1.jpg",
+        path_thread: "images/TS2.jpg",
+        path_strength: "images/TS4.jpg",
+        end_hero: "images/TS3.jpg",
+        end_smart_hero: "images/TS3.jpg",
+        end_clever_escape: "images/TS5.jpg",
+        end_lost_hero: "images/TS6.jpg",
+      };
+
+      // --- VARIÁVEIS E INICIALIZAÇÃO ---
+      const storyTextElement = document.getElementById("story-text");
+      const choicesElement = document.getElementById("choices");
+      const speakButton = document.getElementById("speak-button");
+      const questionModal = document.getElementById("question-modal");
+      const questionTextElement = document.getElementById("question-text");
+      const optionsContainer = document.getElementById("options-container");
+      const submitAnswerButton = document.getElementById("submit-answer");
+      const imageElement = document.getElementById("chapter-image");
+
+      let currentAudio = new Audio();
+      currentAudio.volume = 0.8;
+
+      let chosenPath = "";
+      let activeChapterKey = "start";
+
+      // --- FUNÇÕES ---
+      function renderChapter(chapterKey) {
+        const chapter = storyData[chapterKey];
+        if (!chapter) {
+          console.error("Chapter not found:", chapterKey);
+          return;
+        }
+
+        // Reseta áudio ao mudar de capítulo
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        speakButton.innerText = "Listen to Narration 🔊";
+
+        // Atualiza Texto e Imagem
+        storyTextElement.innerText = chapter.text;
+        choicesElement.innerHTML = "";
+        imageElement.src = imageMap[chapterKey] || "";
+        imageElement.style.display = imageMap[chapterKey] ? "block" : "none";
+
+        activeChapterKey = chapterKey;
+
+        // Gera Botões de Escolha
+        if (chapter.choices && chapter.choices.length > 0) {
+          chapter.choices.forEach((choice) => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.classList.add("choice-button");
+            button.onclick = () => handleChoice(chapterKey, choice.nextChapter);
+            choicesElement.appendChild(button);
+          });
+          speakButton.style.display = "block";
+        } else {
+          // CORREÇÃO: Finais devem mostrar o botão de áudio
+          const restartButton = document.createElement("button");
+          restartButton.innerText = "Restart Story";
+          restartButton.classList.add("choice-button");
+          restartButton.onclick = () => renderChapter("start");
+          choicesElement.appendChild(restartButton);
+          speakButton.style.display = "block"; // CORREÇÃO PARA MOSTRAR O BOTÃO
+        }
+      }
+
+      function handleChoice(chapterKey, nextChapter) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        chosenPath = nextChapter;
+        activeChapterKey = chapterKey;
+        const chapter = storyData[chapterKey];
+        const question = chapter.question;
+
+        if (question) {
+          questionTextElement.innerText = question.prompt;
+          optionsContainer.innerHTML = "";
+          question.options.forEach((option, index) => {
+            optionsContainer.innerHTML += `
+                        <div>
+                            <input type="radio" id="option${index}" name="answer" value="${index}">
+                            <label for="option${index}">${option}</label>
+                        </div>
+                    `;
+          });
+          questionModal.style.display = "flex";
+        } else {
+          renderChapter(chosenPath);
+        }
+      }
+
+      // --- LISTENERS (MP3 e Quiz) ---
+      submitAnswerButton.onclick = () => {
+        const currentQuestionKey = activeChapterKey;
+        if (!currentQuestionKey) return;
+
+        const currentQuestion = storyData[currentQuestionKey].question;
+        const selectedOption = document.querySelector(
+          'input[name="answer"]:checked'
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer.");
+          return;
+        }
+
+        if (
+          parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex
+        ) {
+          questionModal.style.display = "none";
+          renderChapter(chosenPath);
+        } else {
+          alert("That doesn't seem right. Think again and retry.");
+          questionModal.style.display = "none";
+        }
+      };
+
+      speakButton.addEventListener("click", () => {
+        const audioFile = audioMap[activeChapterKey];
+        if (audioFile) {
+          if (
+            currentAudio.src.indexOf(audioFile) === -1 ||
+            currentAudio.paused
+          ) {
+            currentAudio.src = audioFile;
+            currentAudio.play();
+            speakButton.innerText = "Pause Narration ⏸️";
+          } else {
+            currentAudio.pause();
+            speakButton.innerText = "Listen to Narration 🔊";
+          }
+        } else {
+          alert(
+            "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+          );
+        }
+      });
+
+      currentAudio.onended = () => {
+        speakButton.innerText = "Listen to Narration 🔊";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == questionModal) {
+          questionModal.style.display = "none";
+        }
+      };
+
+      // Inicia a história
+      renderChapter("start");
+    </script>
+  </body>
+</html>

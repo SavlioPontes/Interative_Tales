@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>The Serpent's Tooth - A Mythological Adventure</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Cinzel', serif;
+            background-color: #2f3d30; /* Dark Green */
+            color: #E0E0E0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #4a5d4a; /* Lighter Green */
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 25px rgba(222, 184, 135, 0.3); /* Burlywood glow */
+            border: 1px solid #6a7d6a;
+        }
+
+        h1 {
+            color: #DEB887; /* Burlywood */
+            text-align: center;
+            font-weight: 700;
+        }
+
+        #story-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        #chapter-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* CONTROLES DE ÁUDIO */
+        .controls {
+            text-align: center;
+            display: block;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        #speak-button {
+            background-color: #DEB887;
+            color: #2f3d30;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+
+        #speak-button:hover {
+            background-color: #cdaa7a;
+        }
+
+        #choices {
+            display: grid;
+            gap: 15px;
+        }
+
+        .choice-button {
+            background-color: #6a7d6a;
+            color: #E0E0E0;
+            border: 2px solid #8a9d8a;
+            padding: 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 100%;
+            text-align: left;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .choice-button:hover {
+            background-color: #7a8d7a;
+            border-color: #DEB887;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #4a5d4a;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #DEB887;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            color: #E0E0E0;
+        }
+        
+        #question-text {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .options-container div {
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        #submit-answer {
+            background-color: #DEB887;
+            color: #2f3d30;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Serpent's Tooth</h1>
+        <div id="story-container">
+            <img id="chapter-image" src="" alt="Scene Image">
+            <p id="story-text"></p>
+            <div class="controls">
+                <button id="speak-button">Listen to Narration 🔊</button>
+            </div>
+            <div id="choices"></div>
+        </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <p id="question-text"></p>
+            <div id="options-container" class="options-container"></div>
+            <button id="submit-answer">Submit Answer</button>
+        </div>
+    </div>
+
+    <script>
+        const storyData = {
+            'start': {
+                text: "The leaves of Yggdrasil, the great World Tree, are turning yellow. The Norns, keepers of fate, tell you that the serpent Níðhöggr is gnawing its roots with poisoned fangs. To heal the tree, you must get one of those fangs. Where do you begin your quest?",
+                choices: [
+                    { text: "Go directly to the roots of Yggdrasil to face the serpent.", nextChapter: 'path_roots' },
+                    { text: "Travel to the Well of Wisdom to ask Mimir for advice.", nextChapter: 'path_mimir' }
+                ],
+                question: {
+                    prompt: "What is the name of the serpent gnawing the roots of Yggdrasil?",
+                    options: [
+                        "Jörmungandr",
+                        "Fafnir",
+                        "Níðhöggr",
+                        "Fenrir"
+                    ],
+                    correctAnswerIndex: 2
+                }
+            },
+            'path_roots': {
+                text: "You arrive at the dark roots of Yggdrasil. The air is heavy. Níðhöggr is a giant, dark serpent covered in old scars. It is chewing on a large root. It sees you and hisses, its eyes full of ancient hate. It seems too powerful to fight directly. How do you approach?",
+                choices: [
+                    { text: "Try to pull a loose tooth while it is distracted.", nextChapter: 'end_betrayed' },
+                    { text: "Offer it a priceless relic from Asgard in exchange for a tooth.", nextChapter: 'end_hollow_victory' }
+                ],
+                question: {
+                    prompt: "What does the serpent Níðhöggr look like?",
+                    options: [
+                        "A giant, dark serpent with scars.",
+                        "A small, green snake.",
+                        "A serpent with wings.",
+                        "A serpent made of fire."
+                    ],
+                    correctAnswerIndex: 0
+                }
+            },
+            'path_mimir': {
+                text: "You travel to Mimir's Well. To drink, you must sacrifice something you value. You offer your clearest memory of sunlight, and Mimir allows you a drink. You learn that Níðhöggr does not hate the tree; it hates the eagle that lives at the top. The eagle's insults are carried down the tree by a squirrel, Ratatoskr.",
+                choices: [
+                    { text: "Take this knowledge to the serpent to gain its trust.", nextChapter: 'end_true_hero' },
+                    { text: "Use the squirrel Ratatoskr to carry a false message to trick the serpent.", nextChapter: 'end_hollow_victory' }
+                ],
+                question: {
+                    prompt: "What must you sacrifice to drink from Mimir's Well?",
+                    options: [
+                        "A gold coin.",
+                        "Your weapon.",
+                        "Your eye.",
+                        "A valued memory."
+                    ],
+                    correctAnswerIndex: 3
+                }
+            },
+            'end_betrayed': {
+                text: "You try to sneak close to the serpent. But its eyes see all movements in the dark. It strikes faster than lightning. Your quest ends in failure, and the poison spreads faster through Yggdrasil's roots. (A Bad End)",
+                choices: [],
+                question: null
+            },
+            'end_hollow_victory': {
+                text: "Your plan works. You get a tooth from the serpent, either through a trade or a trick. You bring it to the Norns, and they heal the tree. But your victory feels empty. You either lost a precious item or used dishonor to win. The Nine Realms are safe, but your own spirit is heavy. (A Neutral End)",
+                choices: [],
+                question: null
+            },
+            'end_true_hero': {
+                text: "You tell Níðhöggr the truth you learned. The serpent is surprised. For the first time, someone showed it understanding instead of hate. In return for your wisdom, it willingly gives you a shed fang. You heal Yggdrasil not with a weapon, but with knowledge. You are a true hero of the Nine Realms. (A Great End)",
+                choices: [],
+                question: null
+            }
+        };
+        
+        // MAPA DE ÁUDIO MP3
+        const audioMap = {
+            'start': 'audio/serpent_tooth_start.mp3',
+            'path_roots': 'audio/serpent_tooth_roots.mp3',
+            'path_mimir': 'audio/serpent_tooth_mimir.mp3',
+            'end_betrayed': 'audio/serpent_tooth_betrayed_end.mp3',
+            'end_hollow_victory': 'audio/serpent_tooth_hollow_end.mp3',
+            'end_true_hero': 'audio/serpent_tooth_hero_end.mp3'
+        };
+        
+        const imageMap = {
+            'start': 'images/ST1.jpg',
+            'path_roots': 'images/ST2.jpg',
+            'path_mimir': 'images/ST5.jpg',
+            'end_betrayed': 'images/ST3.jpg',
+            'end_hollow_victory': 'images/ST4.jpg',
+            'end_true_hero': 'images/ST6.jpg'
+        };
+        
+        const storyTextElement = document.getElementById('story-text');
+        const choicesElement = document.getElementById('choices');
+        const speakButton = document.getElementById('speak-button');
+        const questionModal = document.getElementById('question-modal');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const submitAnswerButton = document.getElementById('submit-answer');
+        const imageElement = document.getElementById('chapter-image');
+
+        let currentAudio = new Audio();
+        currentAudio.volume = 0.8;
+
+        let activeChapterKey = 'start';
+
+        function renderChapter(chapterKey) {
+            const chapter = storyData[chapterKey];
+            if (!chapter) {
+                console.error("Chapter not found:", chapterKey);
+                return;
+            }
+
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            speakButton.innerText = 'Listen to Narration 🔊';
+
+            storyTextElement.innerText = chapter.text;
+            choicesElement.innerHTML = '';
+            
+            const imagePath = imageMap[chapterKey];
+            if (imagePath) {
+                imageElement.src = imagePath;
+                imageElement.style.display = 'block';
+            } else {
+                imageElement.style.display = 'none';
+            }
+
+            activeChapterKey = chapterKey;
+
+            if (chapter.choices && chapter.choices.length > 0) {
+                chapter.choices.forEach(choice => {
+                    const button = document.createElement('button');
+                    button.innerText = choice.text;
+                    button.classList.add('choice-button');
+                    button.onclick = () => handleChoice(choice.nextChapter);
+                    choicesElement.appendChild(button);
+                });
+                speakButton.style.display = 'inline-block';
+            } else {
+                // CORREÇÃO: Botão de áudio visível no final
+                const restartButton = document.createElement('button');
+                restartButton.innerText = 'Restart';
+                restartButton.classList.add('choice-button');
+                restartButton.onclick = () => renderChapter('start');
+                choicesElement.appendChild(restartButton);
+                speakButton.style.display = 'inline-block'; 
+            }
+        }
+
+        function handleChoice(nextChap) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            
+            const chapter = storyData[activeChapterKey];
+            const question = chapter.question;
+
+            if (question) {
+                questionTextElement.innerText = question.prompt;
+                optionsContainer.innerHTML = '';
+                question.options.forEach((option, index) => {
+                    optionsContainer.innerHTML += `
+                        <div>
+                            <input type="radio" id="option${index}" name="answer" value="${index}">
+                            <label for="option${index}">${option}</label>
+                        </div>
+                    `;
+                });
+                // Salva o próximo capítulo no botão
+                submitAnswerButton.setAttribute('data-next', nextChap);
+                questionModal.style.display = 'flex';
+            } else {
+                renderChapter(nextChap);
+            }
+        }
+
+        submitAnswerButton.onclick = () => {
+            const currentQuestion = storyData[activeChapterKey].question;
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            // Recupera o próximo capítulo do botão
+            const nextChapter = submitAnswerButton.getAttribute('data-next');
+
+            if (!selectedOption) {
+                alert('Please select an answer.');
+                return;
+            }
+
+            if (parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex) {
+                questionModal.style.display = 'none';
+                renderChapter(nextChapter);
+            } else {
+                alert('Incorrect answer. Please read the text again and retry.');
+                questionModal.style.display = 'none';
+            }
+        };
+
+        speakButton.addEventListener('click', () => {
+            const audioFile = audioMap[activeChapterKey];
+            if (audioFile) {
+                if (currentAudio.src.indexOf(audioFile) === -1 || currentAudio.paused) {
+                    currentAudio.src = audioFile;
+                    currentAudio.play();
+                    speakButton.innerText = 'Pause Narration ⏸️';
+                } else {
+                    currentAudio.pause();
+                    speakButton.innerText = 'Listen to Narration 🔊';
+                }
+            } else {
+                alert(
+                    "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+                );
+            }
+        });
+
+        currentAudio.onended = () => {
+            speakButton.innerText = 'Listen to Narration 🔊';
+        };
+
+        window.onclick = function(event) {
+            if (event.target == questionModal) {
+                questionModal.style.display = "none";
+            }
+        }
+
+        // Start the story
+        renderChapter('start');
+    </script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Unworthy Hammer - A Mythological Adventure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+    /* CORREÇÃO DE FUNDO: Aplicando ao HTML e BODY para garantir cobertura total */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #1a202c; /* Azul Escuro (Dark Slate) */
+    }
+
+    body {
+      font-family: 'Cinzel', serif;
+      color: #E0E0E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: #2d3748; /* Azul Acinzentado mais claro */
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(135, 206, 250, 0.3); /* Brilho Azul Celeste */
+      border: 2px solid #4a5568;
+    }
+
+    h1 {
+      color: #87CEFA; /* Azul Claro (Light Sky Blue) */
+      text-align: center;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    #story-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: justify;
+      color: #edf2f7; /* Texto quase branco para leitura fácil */
+    }
+
+    #chapter-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #87CEFA;
+    }
+
+    /* BOTÃO DE ÁUDIO (CENTRALIZAÇÃO) */
+    .controls {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #speak-button {
+      background-color: #87CEFA;
+      color: #1a202c;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    #speak-button:hover {
+      background-color: #63b3ed;
+    }
+
+    #choices {
+      display: grid;
+      gap: 15px;
+    }
+
+    .choice-button {
+      background-color: #4a5568;
+      color: #E0E0E0;
+      border: 2px solid #718096;
+      padding: 15px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 100%;
+      text-align: left;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .choice-button:hover {
+      background-color: #2d3748;
+      border-color: #87CEFA;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #2d3748;
+      margin: auto;
+      padding: 30px;
+      border: 2px solid #87CEFA;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      color: #E0E0E0;
+    }
+    
+    #question-text {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #87CEFA;
+    }
+
+    .options-container div {
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: #1a202c;
+      border-radius: 5px;
+    }
+
+    .options-container label {
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #submit-answer {
+      background-color: #87CEFA;
+      color: #1a202c;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #submit-answer:hover {
+      background-color: #63b3ed;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>The Unworthy Hammer</h1>
+  <div id="story-container">
+    <img id="chapter-image" src="" alt="Scene Image">
+    <p id="story-text"></p>
+    
+    <div class="controls">
+      <button id="speak-button">Listen to Narration 🔊</button>
+    </div>
+    
+    <div id="choices"></div>
+  </div>
+</div>
+
+<div id="question-modal" class="modal">
+  <div class="modal-content">
+    <p id="question-text"></p>
+    <div id="options-container" class="options-container"></div>
+    <button id="submit-answer">Submit Answer</button>
+  </div>
+</div>
+
+<script>
+  const storyData = {
+    'start': {
+      text: "You are Bjorn, a young blacksmith. A terrible battle has cracked Thor's hammer, Mjölnir. It cannot be lifted by anyone, not even the God of Thunder. The dwarves of Nidavellir, the original creators, are the only ones who can reforge it. To get their help, you must bring them a worthy gift. Where do you search first?",
+      choices: [
+        { text: "Seek the 'Sunstone' from the heart of a fallen star.", nextChapter: 'path_star' },
+        { text: "Find the 'Whispering Ice' from the tallest peak in Jotunheim.", nextChapter: 'path_ice' }
+      ],
+      question: {
+        prompt: "What is wrong with Thor's hammer, Mjölnir?",
+        options: [
+          "It is lost.",
+          "It is too heavy.",
+          "It is cracked and cannot be lifted.",
+          "It was stolen by Loki."
+        ],
+        correctAnswerIndex: 2
+      }
+    },
+    'path_star': {
+      text: "You journey to a deep crater where a star fell long ago. In the center, a beautiful crystal glows with warm light. This is the Sunstone. As you reach for it, the ground shakes. A stone golem, the crater's guardian, rises from the earth. How do you deal with the guardian?",
+      choices: [
+        { text: "Offer it a finely crafted axe head from your bag as a sign of respect.", nextChapter: 'end_success' },
+        { text: "Try to fight the golem with your blacksmith's hammer.", nextChapter: 'end_neutral' }
+      ],
+      question: {
+        prompt: "What is the name of the crystal you are looking for?",
+        options: [
+          "The Sunstone",
+          "The Moonrock",
+          "The Earthgem",
+          "The Skystone"
+        ],
+        correctAnswerIndex: 0
+      }
+    },
+    'path_ice': {
+      text: "You climb the highest, coldest mountain in the land of the giants. The wind howls around you. At the peak, you find a shard of ice that seems to hum with a quiet melody. This is the Whispering Ice. As you take it, an old Frost Giant sees you. He looks lonely, not angry. What do you do?",
+      choices: [
+        { text: "Sit and listen to the giant's story of the old days.", nextChapter: 'end_success' },
+        { text: "Run away with the ice before the giant can react.", nextChapter: 'end_neutral' }
+      ],
+      question: {
+        prompt: "Where do you find the Whispering Ice?",
+        options: [
+          "In a frozen river.",
+          "In an ice cave.",
+          "Inside a glacier.",
+          "On the tallest mountain in Jotunheim."
+        ],
+        correctAnswerIndex: 3
+      }
+    },
+    'end_neutral': {
+      text: "You chose a path of conflict or haste. You manage to escape with your life, but without the gift. The dwarves will not help you. Mjölnir remains broken, a symbol of a problem that could not be solved. You return home, wiser about the limits of force. (The End)",
+      choices: [],
+      question: null
+    },
+    'end_success': {
+      text: "By choosing a path of respect and understanding, you earn the gift you sought. You take it to the dwarves of Nidavellir. Impressed by your offering and your spirit, they agree to help. Their forges roar to life, and with your help, they mend the great hammer. Mjölnir is whole again, and you have earned a place in the sagas. (The End)",
+      choices: [],
+      question: null
+    }
+  };
+
+  // --- MAPA DE ÁUDIO ---
+  const audioMap = {
+    'start': 'audio/hammer_start.mp3',
+    'path_star': 'audio/hammer_star.mp3',
+    'path_ice': 'audio/hammer_ice.mp3',
+    'end_neutral': 'audio/hammer_neutral_end.mp3',
+    'end_success': 'audio/hammer_success_end.mp3'
+  };
+
+  // --- MAPA DE IMAGEM ---
+  const imageMap = {
+    'start': 'images/UH1.jpg',
+    'path_star': 'images/UH2.jpg',
+    'path_ice': 'images/UH4.jpg',
+    'end_success': 'images/uh5.jpg',
+    'end_neutral': 'images/UH6.jpg'
+  };
+  
+  const storyTextElement = document.getElementById('story-text');
+  const choicesElement = document.getElementById('choices');
+  const speakButton = document.getElementById('speak-button');
+  const questionModal = document.getElementById('question-modal');
+  const questionTextElement = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const submitAnswerButton = document.getElementById('submit-answer');
+  const imageElement = document.getElementById('chapter-image');
+
+  let currentAudio = new Audio();
+  currentAudio.volume = 0.8;
+
+  let activeChapterKey = 'start';
+
+  function renderChapter(chapterKey) {
+    const chapter = storyData[chapterKey];
+    if (!chapter) return;
+
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    speakButton.innerText = 'Listen to Narration 🔊';
+
+    storyTextElement.innerText = chapter.text;
+    choicesElement.innerHTML = '';
+    
+    const imagePath = imageMap[chapterKey];
+    if (imagePath) {
+      imageElement.src = imagePath;
+      imageElement.style.display = 'block';
+    } else {
+      imageElement.style.display = 'none';
+    }
+
+    activeChapterKey = chapterKey;
+
+    if (chapter.choices && chapter.choices.length > 0) {
+      chapter.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.innerText = choice.text;
+        button.classList.add('choice-button');
+        button.onclick = () => handleChoice(choice.nextChapter);
+        choicesElement.appendChild(button);
+      });
+      speakButton.style.display = 'inline-block';
+    } else {
+      const restartButton = document.createElement('button');
+      restartButton.innerText = 'Restart';
+      restartButton.classList.add('choice-button');
+      restartButton.onclick = () => renderChapter('start');
+      choicesElement.appendChild(restartButton);
+      speakButton.style.display = 'inline-block';
+    }
+  }
+
+  function handleChoice(nextChap) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    
+    const nextChapter = nextChap;
+    const chapter = storyData[activeChapterKey];
+    const question = chapter.question;
+
+    if (question) {
+      questionTextElement.innerText = question.prompt;
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        optionsContainer.innerHTML += `
+          <div>
+            <input type="radio" id="option${index}" name="answer" value="${index}">
+            <label for="option${index}">${option}</label>
+          </div>
+        `;
+      });
+      
+      submitAnswerButton.dataset.next = nextChapter;
+      questionModal.style.display = 'flex';
+    } else {
+      renderChapter(nextChapter);
+    }
+  }
+
+  submitAnswerButton.onclick = () => {
+    const currentQuestion = storyData[activeChapterKey].question;
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    const nextChapter = submitAnswerButton.dataset.next;
+
+    if (!selectedOption) {
+      alert('Please select an answer.');
+      return;
+    }
+
+    if (parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex) {
+      questionModal.style.display = 'none';
+      renderChapter(nextChapter);
+    } else {
+      alert('Incorrect answer. Please try again.');
+      questionModal.style.display = 'none';
+    }
+  };
+
+  speakButton.addEventListener('click', () => {
+    const audioFile = audioMap[activeChapterKey];
+    if (audioFile) {
+      if (currentAudio.src.indexOf(audioFile) === -1 || currentAudio.paused) {
+        currentAudio.src = audioFile;
+        currentAudio.play();
+        speakButton.innerText = 'Pause Narration ⏸️';
+      } else {
+        currentAudio.pause();
+        speakButton.innerText = 'Listen to Narration 🔊';
+      }
+    } else {
+      alert('Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder.');
+    }
+  });
+
+  currentAudio.onended = () => {
+    speakButton.innerText = 'Listen to Narration 🔊';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == questionModal) {
+      questionModal.style.display = "none";
+    }
+  }
+
+  renderChapter('start');
+</script>
+</body>
+</html>

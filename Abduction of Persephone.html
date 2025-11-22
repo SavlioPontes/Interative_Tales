@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Abduction of Persephone - A Mythological Tale</title>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+
+      /* Estilos Gerais (Papiro/Antigo) */
+      body {
+        font-family: "Cinzel", serif;
+        background-color: #f5f5dc; /* Bege claro, como pergaminho */
+        color: #3d2b1f; /* Marrom escuro para o texto */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background-color: #fdf5e6; /* Branco Renda Antiga */
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 25px rgba(89, 48, 1, 0.3);
+        border: 2px solid #daa520; /* Dourado */
+      }
+
+      h1 {
+        color: #b8860b; /* Dourado escuro */
+        text-align: center;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 20px;
+      }
+
+      #story-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        text-align: justify;
+        margin-bottom: 30px;
+        white-space: pre-wrap;
+      }
+
+      /* Imagem */
+      #chapter-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #3d2b1f;
+        display: none;
+      }
+
+      /* Botões de Escolha */
+      #choices {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+      }
+
+      .choice-button {
+        background-color: #daa520; /* Dourado */
+        color: #3d2b1f;
+        border: 2px solid #b8860b;
+        padding: 12px 20px;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.1s;
+      }
+
+      .choice-button:hover {
+        background-color: #b8860b; /* Dourado Escuro */
+        color: #fdf5e6;
+        transform: translateY(-2px);
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      #speak-button {
+        background-color: #5d4037; /* Marrom */
+        color: #fdf5e6;
+        border: none;
+        padding: 10px 15px;
+        font-family: "Cinzel", serif;
+        font-size: 0.9em;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block; /* Ajuda na centralização */
+      }
+
+      #speak-button:hover {
+        background-color: #3e2723;
+      }
+
+      /* Modal (Para o Quiz) */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #fdf5e6;
+        margin: 15% auto;
+        padding: 30px;
+        border: 3px solid #b8860b;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+        color: #3d2b1f;
+        text-align: center;
+      }
+
+      #question-text {
+        font-weight: 700;
+        margin-bottom: 20px;
+      }
+
+      .options-container div {
+        text-align: left;
+        margin-bottom: 10px;
+        padding: 5px;
+        border-bottom: 1px dashed #daa520;
+      }
+
+      .options-container label {
+        cursor: pointer;
+      }
+
+      #submit-answer {
+        margin-top: 20px;
+        background-color: #008000;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        transition: background-color 0.3s;
+      }
+      #submit-answer:hover {
+        background-color: #006400;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>The Abduction of Persephone</h1>
+      <div id="story-container">
+        <img id="chapter-image" src="" alt="Scene from the Tale" />
+        <p id="story-text"></p>
+
+        <div class="controls">
+          <button id="speak-button">Listen to Narration 🔊</button>
+        </div>
+
+        <div id="choices"></div>
+      </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+      <div class="modal-content">
+        <p id="question-text"></p>
+        <div id="options-container" class="options-container"></div>
+        <button id="submit-answer">Submit Answer</button>
+      </div>
+    </div>
+
+    <script>
+      const storyData = {
+        start: {
+          text: "You are Persephone, daughter of Demeter, goddess of the harvest. You spend your days in the lush meadows, a symbol of spring's bounty. The sun shines brightly, and the air is filled with the sweet scent of narcissus. As you reach for a particularly beautiful flower, the ground trembles and a great chasm opens. Out of it emerges a dark chariot, and its rider, Hades, King of the Underworld, seizes you. Your world of light is instantly replaced by a realm of shadows.",
+          choices: [
+            {
+              text: "Call out for your mother, Demeter, with all your might.",
+              nextChapter: "path_call_mother",
+            },
+            {
+              text: "Try to reason with Hades, demanding to know why you have been taken.",
+              nextChapter: "path_reason",
+            },
+          ],
+          question: {
+            prompt: "Who is Persephone's mother?",
+            options: ["Hera", "Artemis", "Demeter", "Aphrodite"],
+            correctAnswerIndex: 2,
+          },
+        },
+        path_call_mother: {
+          text: "Your scream echoes through the dark tunnels as Hades pulls you down. Though he is an all-powerful god, your cry for your mother pierces his heart slightly. He tells you that your mother cannot reach you here and that you are destined to be queen of this realm. He offers you a seat on his throne and a pomegranate to quench your thirst. What do you do?",
+          choices: [
+            {
+              text: "Eat the pomegranate seeds, accepting your new fate.",
+              nextChapter: "end_seasons",
+            },
+            {
+              text: "Refuse the fruit and demand to be returned to the surface.",
+              nextChapter: "end_refusal",
+            },
+          ],
+          question: {
+            prompt: "What is Hades's domain?",
+            options: [
+              "The Sea",
+              "The Sky",
+              "The Underworld",
+              "The Battlefield",
+            ],
+            correctAnswerIndex: 2,
+          },
+        },
+        path_reason: {
+          text: "You confront Hades, your voice trembling but firm. He is impressed by your courage. 'I have lived a solitary existence,' he says. 'The world above has its light, but this world needs its queen.' He tells you that if you willingly eat a single seed from the pomegranate he offers, he will grant a wish. You are suspicious, but the chance to have some control over your situation is tempting. Do you eat the pomegranate?",
+          choices: [
+            {
+              text: "Eat a single seed, wishing for a way to communicate with your mother.",
+              nextChapter: "end_communication",
+            },
+            {
+              text: "Refuse to eat the fruit, believing his offer is a trick.",
+              nextChapter: "end_refusal",
+            },
+          ],
+          question: {
+            prompt: "What is the name of the fruit offered to Persephone?",
+            options: ["Apple", "Pomegranate", "Grape", "Fig"],
+            correctAnswerIndex: 1,
+          },
+        },
+        end_seasons: {
+          text: "You accept your role as queen. Your mother, Demeter, mourns your loss, and the world above grows cold and barren. But an agreement is struck with Zeus. For the six seeds you ate, you will spend six months of the year as queen of the Underworld. When you return, your mother's joy brings forth spring and summer. The seasons are born from your choice. (The End)",
+          choices: [],
+          question: null,
+        },
+        end_refusal: {
+          text: "You refuse to eat, and your determination is noticed by Zeus. Seeing your distress and your mother's grief, he orders Hades to release you, but it is too late. The law of the Underworld is absolute: if you have not eaten, you cannot stay, but a portion of you remains. You return to your mother, but a part of your spirit is forever linked to the realm of shadows. (The End)",
+          choices: [],
+          question: null,
+        },
+        end_communication: {
+          text: "You eat a single seed and wish for a way to communicate with Demeter. Hades, honoring his promise, grants you the power to send a single message. You tell your mother of your situation, and she pleads your case to Zeus. An agreement is reached: you will be queen of the Underworld for six months each year, and when you return, a message will travel with you to your mother, bringing hope and signaling the coming of spring. (The End)",
+          choices: [],
+          question: null,
+        },
+      };
+
+      // Mapeamento dos arquivos de áudio (MP3)
+      const audioMap = {
+        start: "audio/persephone_start.mp3",
+        path_call_mother: "audio/persephone_mother.mp3",
+        path_reason: "audio/persephone_reason.mp3",
+        end_seasons: "audio/persephone_seasons_end.mp3",
+        end_refusal: "audio/persephone_refusal_end.mp3",
+        end_communication: "audio/persephone_comm_end.mp3",
+      };
+
+      // Mapeamento dos arquivos de imagem
+      const imageMap = {
+        start: "images/AP1.jpg",
+        path_call_mother: "images/AP2.jpg",
+        path_reason: "images/AP2.jpg",
+        end_seasons: "images/AP3jpg.jpg",
+        end_refusal: "images/AP6.jpg",
+        end_communication: "images/AP4jpg.jpg",
+      };
+
+      const storyTextElement = document.getElementById("story-text");
+      const choicesElement = document.getElementById("choices");
+      const speakButton = document.getElementById("speak-button");
+      const questionModal = document.getElementById("question-modal");
+      const questionTextElement = document.getElementById("question-text");
+      const optionsContainer = document.getElementById("options-container");
+      const submitAnswerButton = document.getElementById("submit-answer");
+      const imageElement = document.getElementById("chapter-image");
+
+      let currentAudio = new Audio();
+      currentAudio.volume = 0.8;
+
+      let chosenPath = "";
+      let activeChapterKey = "start";
+
+      function renderChapter(chapterKey) {
+        const chapter = storyData[chapterKey];
+        if (!chapter) {
+          console.error("Chapter not found:", chapterKey);
+          return;
+        }
+
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        speakButton.innerText = "Listen to Narration 🔊";
+
+        storyTextElement.innerText = chapter.text;
+        choicesElement.innerHTML = "";
+        imageElement.src = imageMap[chapterKey] || "";
+        imageElement.style.display = imageMap[chapterKey] ? "block" : "none";
+
+        activeChapterKey = chapterKey;
+
+        if (chapter.choices && chapter.choices.length > 0) {
+          chapter.choices.forEach((choice) => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.classList.add("choice-button");
+            button.onclick = () => handleChoice(chapterKey, choice.nextChapter);
+            choicesElement.appendChild(button);
+          });
+          speakButton.style.display = "block";
+        } else {
+          // CORREÇÃO APLICADA AQUI: Mostrar o botão no final
+          const restartButton = document.createElement("button");
+          restartButton.innerText = "Restart Story";
+          restartButton.classList.add("choice-button");
+          restartButton.onclick = () => renderChapter("start");
+          choicesElement.appendChild(restartButton);
+          speakButton.style.display = "block"; // AQUI ESTÁ A CORREÇÃO
+        }
+      }
+
+      function handleChoice(chapterKey, nextChapter) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        chosenPath = nextChapter;
+        activeChapterKey = chapterKey;
+        const chapter = storyData[chapterKey];
+        const question = chapter.question;
+
+        if (question) {
+          questionTextElement.innerText = question.prompt;
+          optionsContainer.innerHTML = "";
+          question.options.forEach((option, index) => {
+            optionsContainer.innerHTML += `
+              <div>
+                <input type="radio" id="option${index}" name="answer" value="${index}">
+                <label for="option${index}">${option}</label>
+              </div>
+            `;
+          });
+          questionModal.style.display = "flex";
+        } else {
+          renderChapter(chosenPath);
+        }
+      }
+
+      submitAnswerButton.onclick = () => {
+        const currentQuestionKey = activeChapterKey;
+        if (!currentQuestionKey) return;
+
+        const currentQuestion = storyData[currentQuestionKey].question;
+        const selectedOption = document.querySelector(
+          'input[name="answer"]:checked'
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer.");
+          return;
+        }
+
+        if (
+          parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex
+        ) {
+          questionModal.style.display = "none";
+          renderChapter(chosenPath);
+        } else {
+          alert("That doesn't seem right. Think again and retry.");
+          questionModal.style.display = "none";
+        }
+      };
+
+      speakButton.addEventListener("click", () => {
+        const audioFile = audioMap[activeChapterKey];
+        if (audioFile) {
+          if (
+            currentAudio.src.indexOf(audioFile) === -1 ||
+            currentAudio.paused
+          ) {
+            currentAudio.src = audioFile;
+            currentAudio.play();
+            speakButton.innerText = "Pause Narration ⏸️";
+          } else {
+            currentAudio.pause();
+            speakButton.innerText = "Listen to Narration 🔊";
+          }
+        } else {
+          alert(
+            "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+          );
+        }
+      });
+
+      currentAudio.onended = () => {
+        speakButton.innerText = "Listen to Narration 🔊";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == questionModal) {
+          questionModal.style.display = "none";
+        }
+      };
+
+      renderChapter("start");
+    </script>
+  </body>
+</html>

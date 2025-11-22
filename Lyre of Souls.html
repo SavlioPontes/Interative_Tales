@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Lyre of Souls - A Mythological Adventure</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+
+      body {
+        font-family: "Cinzel", serif;
+        background-color: #121212;
+        color: #e0e0e0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background-color: #1e1e1e;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
+        border: 1px solid #333;
+      }
+
+      h1 {
+        color: #ffd700;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      #story-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-align: justify;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      #speak-button {
+        background-color: #ffd700;
+        color: #121212;
+        border: none;
+        padding: 10px 20px;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block;
+      }
+
+      #speak-button:hover {
+        background-color: #ffc400;
+      }
+
+      #choices {
+        display: grid;
+        gap: 15px;
+      }
+
+      .choice-button {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 2px solid #555;
+        padding: 15px;
+        font-family: "Cinzel", serif;
+        font-size: 1.1em;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .choice-button:hover {
+        background-color: #444;
+        border-color: #ffd700;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #1e1e1e;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #ffd700;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        color: #e0e0e0;
+      }
+
+      #question-text {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+
+      .options-container div {
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      #submit-answer {
+        background-color: #ffd700;
+        color: #121212;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        margin-top: 20px;
+      }
+
+      #chapter-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>The Lyre of Souls</h1>
+      <div id="story-container">
+        <img id="chapter-image" src="" alt="Scene Image" />
+        <p id="story-text"></p>
+        <div class="controls">
+          <button id="speak-button">Listen to Narration 🔊</button>
+        </div>
+        <div id="choices"></div>
+      </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+      <div class="modal-content">
+        <p id="question-text"></p>
+        <div id="options-container" class="options-container"></div>
+        <button id="submit-answer">Submit Answer</button>
+      </div>
+    </div>
+
+    <script>
+      const storyData = {
+        start: {
+          text: "You are Lyra, child of Apollo. Tormented souls are escaping the Underworld, and your quest is to retrieve the Lyre of Orpheus to restore peace. You arrive at the bank of the River Styx, the watery border of Hades' realm. Before you, the ferryman Charon waits in his skeletal gondola, his gaze empty. The air is heavy with laments, and the river flows with the shadows of the lost. What do you do?",
+          choices: [
+            {
+              text: "Pay Charon with a coin to cross the Styx.",
+              nextChapter: "path_charon",
+            },
+            {
+              text: "Explore the riverbank for a secret passage.",
+              nextChapter: "path_secret",
+            },
+          ],
+          question: {
+            prompt:
+              "What is the primary challenge Lyra faces upon arriving at the entrance to the Underworld?",
+            options: [
+              "Finding the Lyre of Orpheus.",
+              "Defeating a guardian monster.",
+              "The need to cross the River Styx.", // Index 2
+              "Convincing Hades to help her.",
+            ],
+            correctAnswerIndex: 2, // CORRIGIDO: Agora usa o índice numérico
+          },
+        },
+        path_charon: {
+          text: "You offer the gold coin to Charon. He accepts it with a silent grunt and nods for you to enter. As the gondola glides across the black waters, the ferryman points to the distant shore: 'Many arrive, few return. The gate's guardian, Cerberus, is not impressed by muscle or blades. His fury is eternal.' His warning echoes in your mind as you approach the gate of Tartarus, where the silhouette of a three-headed beast stirs.",
+          choices: [
+            {
+              text: "Attempt to tame Cerberus with the strength of your divine heritage.",
+              nextChapter: "end_force",
+            },
+            {
+              text: "Use your flute to create a melody to soothe the beast.",
+              nextChapter: "end_melody",
+            },
+          ],
+          question: {
+            prompt:
+              "After overcoming the first obstacle, what is the next major threat Lyra knows she must face to reach Tartarus?",
+            options: [
+              "The ferryman Charon.",
+              "The lost souls of the Underworld.",
+              "Treacherous illusions and whispers.",
+              "Cerberus, the three-headed dog.", // Index 3
+            ],
+            correctAnswerIndex: 3, // CORRIGIDO: Agora usa o índice numérico
+          },
+        },
+        path_secret: {
+          text: "You decide not to trust the ferryman and follow the rocky shore. You soon find a grotto hidden by dark, lifeless vines. Inside, ancient inscriptions warn that the path tests the mind, not the body. You press on through a damp tunnel, where whispers of doubt and fear try to lead you astray. Focusing on your mission, you ignore the illusions and emerge on the other side, before the imposing gate of Tartarus. There, Cerberus, the three-headed dog, snarls, sensing your presence.",
+          choices: [
+            {
+              text: "Attempt to tame Cerberus with the strength of your divine heritage.",
+              nextChapter: "end_force",
+            },
+            {
+              text: "Use your flute to create a melody to soothe the beast.",
+              nextChapter: "end_melody",
+            },
+          ],
+          question: {
+            prompt:
+              "After overcoming the first obstacle, what is the next major threat Lyra knows she must face to reach Tartarus?",
+            options: [
+              "The ferryman Charon.",
+              "The lost souls of the Underworld.",
+              "Treacherous illusions and whispers.",
+              "Cerberus, the three-headed dog.", // Index 3
+            ],
+            correctAnswerIndex: 3, // CORRIGIDO: Agora usa o índice numérico
+          },
+        },
+        end_force: {
+          text: "Trusting in the power that runs through your veins, you try to intimidate the beast. A golden aura emanates from you, but it only enrages Cerberus. The hellhound doesn't see a demigod, but a challenge. With a roar that shakes the foundations of the Underworld, it lunges. You are forced to retreat, suffering a deep wound. The mission has failed. The world of the living will have to endure the wailing of souls for longer.",
+          choices: [],
+          question: null,
+        },
+        end_melody: {
+          text: "You bring your ebony flute to your lips. A soft, hopeful melody fills the air, a sound that doesn't belong in this place of despair. Cerberus's three heads stop snarling. One by one, they lie down, their fierce eyes closing to the sound of your divine lullaby. The beast falls asleep. The path is clear. You enter, find the Lyre of Orpheus on an obsidian pedestal, and return as a hero. Peace is restored.",
+          choices: [],
+          question: null,
+        },
+      };
+
+      // --- MAPAS ---
+      const audioMap = {
+        start: "audio/lyre_start.mp3",
+        path_charon: "audio/lyre_charon.mp3",
+        path_secret: "audio/lyre_secret.mp3",
+        end_force: "audio/lyre_force_end.mp3",
+        end_melody: "audio/lyre_melody_end.mp3",
+      };
+
+      const imageMap = {
+        start: "images/styx.jpg",
+        path_charon: "images/charon.png",
+        path_secret: "images/grotto.jpg",
+        end_force: "images/cerberus_attack.jpg",
+        end_melody: "images/cerberus_peace.jpg",
+      };
+
+      // --- VARIÁVEIS E FUNÇÕES (MP3 e Quiz Logic) ---
+      const storyTextElement = document.getElementById("story-text");
+      const choicesElement = document.getElementById("choices");
+      const speakButton = document.getElementById("speak-button");
+      const questionModal = document.getElementById("question-modal");
+      const questionTextElement = document.getElementById("question-text");
+      const optionsContainer = document.getElementById("options-container");
+      const submitAnswerButton = document.getElementById("submit-answer");
+      const imageElement = document.getElementById("chapter-image");
+
+      let currentAudio = new Audio();
+      currentAudio.volume = 0.8;
+
+      let chosenPath = "";
+      let activeChapterKey = "start";
+
+      function renderChapter(chapterKey) {
+        const chapter = storyData[chapterKey];
+        if (!chapter) {
+          console.error("Chapter not found:", chapterKey);
+          return;
+        }
+
+        // Reseta áudio ao mudar de capítulo
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        speakButton.innerText = "Listen to Narration 🔊";
+
+        storyTextElement.innerText = chapter.text;
+        choicesElement.innerHTML = "";
+        imageElement.src = imageMap[chapterKey] || "";
+        imageElement.style.display = imageMap[chapterKey] ? "block" : "none";
+
+        activeChapterKey = chapterKey;
+
+        if (chapter.choices && chapter.choices.length > 0) {
+          chapter.choices.forEach((choice) => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.classList.add("choice-button");
+            button.onclick = () => handleChoice(chapterKey, choice.nextChapter);
+            choicesElement.appendChild(button);
+          });
+          speakButton.style.display = "block";
+        } else {
+          // CORREÇÃO: Finais devem mostrar o botão de áudio
+          const restartButton = document.createElement("button");
+          restartButton.innerText = "Restart Story";
+          restartButton.classList.add("choice-button");
+          restartButton.onclick = () => renderChapter("start");
+          choicesElement.appendChild(restartButton);
+          speakButton.style.display = "block"; // CORRIGIDO
+        }
+      }
+
+      function handleChoice(chapterKey, nextChapter) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        chosenPath = nextChapter;
+        activeChapterKey = chapterKey;
+        const chapter = storyData[chapterKey];
+        const question = chapter.question;
+
+        if (question) {
+          questionTextElement.innerText = question.prompt;
+          optionsContainer.innerHTML = "";
+          question.options.forEach((option, index) => {
+            optionsContainer.innerHTML += `
+                        <div>
+                            <input type="radio" id="option${index}" name="answer" value="${index}">
+                            <label for="option${index}">${option}</label>
+                        </div>
+                    `;
+          });
+          questionModal.style.display = "flex";
+        } else {
+          renderChapter(chosenPath);
+        }
+      }
+
+      submitAnswerButton.onclick = () => {
+        const currentQuestionKey = activeChapterKey;
+        if (!currentQuestionKey) return;
+
+        const currentQuestion = storyData[currentQuestionKey].question;
+        const selectedOption = document.querySelector(
+          'input[name="answer"]:checked'
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer.");
+          return;
+        }
+
+        // Lógica do Quiz padronizada para índice numérico
+        if (
+          parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex
+        ) {
+          questionModal.style.display = "none";
+          renderChapter(chosenPath);
+        } else {
+          alert("That doesn't seem right. Think again and retry.");
+          questionModal.style.display = "none";
+        }
+      };
+
+      speakButton.addEventListener("click", () => {
+        const audioFile = audioMap[activeChapterKey];
+        if (audioFile) {
+          if (
+            currentAudio.src.indexOf(audioFile) === -1 ||
+            currentAudio.paused
+          ) {
+            currentAudio.src = audioFile;
+            currentAudio.play();
+            speakButton.innerText = "Pause Narration ⏸️";
+          } else {
+            currentAudio.pause();
+            speakButton.innerText = "Listen to Narration 🔊";
+          }
+        } else {
+          alert(
+            "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+          );
+        }
+      });
+
+      currentAudio.onended = () => {
+        speakButton.innerText = "Listen to Narration 🔊";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == questionModal) {
+          questionModal.style.display = "none";
+        }
+      };
+
+      // Start the story
+      renderChapter("start");
+    </script>
+  </body>
+</html>

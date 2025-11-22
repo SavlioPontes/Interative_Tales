@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Tales</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --dark-background: #1c1c1c;
+        --text-color: #fdf5e6; /* Parchment White */
+        --gold-accent: #daa520; /* Goldenrod */
+        --gold-light: #ffd700;
+      }
+
+      body {
+        font-family: "Cinzel", serif;
+        background-color: var(--dark-background);
+        color: var(--text-color);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+      }
+
+      header {
+        text-align: center;
+        padding: 60px 0;
+      }
+
+      h1 {
+        font-size: 3.5em;
+        font-weight: 900;
+        color: var(--gold-light);
+        text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        border-bottom: 3px solid var(--gold-accent);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      p.subtitle {
+        font-size: 1.2em;
+        margin-top: -10px;
+        color: #ccc;
+      }
+
+      .container {
+        max-width: 900px;
+        width: 100%;
+        background-color: #2a2a2a;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        margin-bottom: 30px;
+        border: 1px solid #444;
+      }
+
+      /* START BUTTON */
+      .start-button-area {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      #startButton {
+        background-color: var(--gold-accent);
+        color: var(--dark-background);
+        font-family: "Cinzel", serif;
+        font-size: 1.8em;
+        font-weight: 700;
+        padding: 15px 40px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: background-color 0.3s, transform 0.2s;
+        box-shadow: 0 5px 15px rgba(218, 165, 32, 0.5);
+      }
+
+      #startButton:hover {
+        background-color: var(--gold-light);
+        transform: scale(1.05);
+      }
+
+      /* SECTION STYLES */
+      .section-title {
+        font-size: 1.8em;
+        color: var(--gold-light);
+        border-bottom: 1px solid var(--gold-accent);
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+        font-weight: 700;
+      }
+
+      /* STORY LIST */
+      #storyList {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      #storyList li {
+        background: #333;
+        border-left: 5px solid var(--gold-accent);
+        padding: 15px;
+        border-radius: 5px;
+        transition: background 0.3s;
+      }
+
+      #storyList li:hover {
+        background: #444;
+      }
+
+      #storyList a {
+        text-decoration: none;
+        color: var(--text-color);
+        font-weight: 400;
+        display: block;
+      }
+
+      #storyList a:hover {
+        color: var(--gold-light);
+      }
+
+      .credit-item {
+        margin-bottom: 10px;
+      }
+      .credit-title {
+        font-weight: 700;
+        color: var(--gold-accent);
+        display: block;
+      }
+
+      /* Hidden initially, shown after click */
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>INTERACTIVE TALES</h1>
+      <p class="subtitle">An Adventure Through Ancient Legends</p>
+    </header>
+
+    <div class="start-button-area">
+      <button id="startButton">START ADVENTURE</button>
+    </div>
+
+    <div class="container" id="infoSections">
+      <section>
+        <h2 class="section-title">HOW IT WORKS</h2>
+        <p>
+          This is a collection of interactive, text-based adventures. Read the
+          story and make choices when prompted. Some chapters may include
+          quizzes to test your understanding before proceeding.
+        </p>
+        <p>
+          <strong>Note:</strong> Each story is self-contained. You can explore
+          them in any order.
+        </p>
+      </section>
+
+      <section style="margin-top: 30px">
+        <h2 class="section-title">CREDITS</h2>
+
+        <div class="credit-item">
+          <span class="credit-title">Extension Project:</span> Tecnologia em
+          Educação na CCB
+        </div>
+        <div class="credit-item">
+          <span class="credit-title">Concept, Corrections and Ideas:</span>
+          Prof. Francisco Tarcizio Cavalcante Benevides Junior
+        </div>
+        <div class="credit-item">
+          <span class="credit-title"
+            >Story, Primary Development and Image Assets:</span
+          >
+          Felipe Bomfim Teles
+        </div>
+        <div class="credit-item">
+          <span class="credit-title"
+            >Second Development, Deployment and Audio Assets:</span
+          >
+          Savlio Carvalho Pontes
+        </div>
+        <div class="credit-item">
+          <span class="credit-title">Technologies Used:</span> HTML, CSS, and
+          JavaScript
+        </div>
+      </section>
+
+      <section
+        class="hidden"
+        id="storySelectionSection"
+        style="margin-top: 30px"
+      >
+        <h2 class="section-title">CHOOSE A TALE</h2>
+        <ul id="storyList">
+          <li>
+            <a href="Abduction of Persephone.html">Abduction of Persephone</a>
+          </li>
+          <li><a href="Lyre of Souls.html">Lyre of Souls</a></li>
+          <li><a href="Midas.html">Midas</a></li>
+          <li><a href="Serpent's Coil.html">Serpent's Coil</a></li>
+          <li><a href="Serpent's Tooth.html">Serpent's Tooth</a></li>
+          <li><a href="Thread of Pride.html">Thread of Pride</a></li>
+          <li><a href="Unworthy Hammer.html">Unworthy Hammer</a></li>
+          <li><a href="Valkyrie's Whisper.html">Valkyrie's Whisper</a></li>
+          <li><a href="Whispering Grove.html">Whispering Grove</a></li>
+          <li><a href="Labyrinth's Shadow.html">Labyrinth's Shadow</a></li>
+        </ul>
+      </section>
+    </div>
+
+    <script>
+      document
+        .getElementById("startButton")
+        .addEventListener("click", function () {
+          const selection = document.getElementById("storySelectionSection");
+          const button = document.getElementById("startButton");
+
+          // 1. Mostrar a lista de histórias
+          selection.classList.remove("hidden");
+
+          // 2. Mudar o texto do botão
+          button.innerText = "CHOOSE A TALE";
+
+          // 3. Scroll suave até a lista
+          selection.scrollIntoView({ behavior: "smooth" });
+        });
+    </script>
+  </body>
+</html>

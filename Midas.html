@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Midas Touch - A Mythological Tale</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+
+      body {
+        font-family: "Cinzel", serif;
+        background-color: #4d1933;
+        color: #fdf5e6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .container {
+        max-width: 800px;
+        width: 100%;
+        background-color: #2e0e1e;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 0 25px rgba(218, 165, 32, 0.6);
+        border: 2px solid #daa520;
+      }
+
+      h1 {
+        color: #ffeb3b;
+        text-align: center;
+        font-weight: 700;
+      }
+
+      #story-text {
+        color: #fdf5e6;
+        font-size: 1.1em;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        text-align: justify;
+      }
+
+      #chapter-image {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Controles de Áudio Centralizados */
+      .controls {
+        text-align: center;
+        display: block;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
+      #speak-button {
+        background-color: #daa520;
+        color: #4d1933;
+        border: none;
+        padding: 10px 20px;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+        display: inline-block;
+      }
+
+      #speak-button:hover {
+        background-color: #ffeb3b;
+      }
+
+      #choices {
+        display: grid;
+        gap: 15px;
+      }
+
+      .choice-button {
+        background-color: #3e1b29;
+        color: #fdf5e6;
+        border: 2px solid #daa520;
+        padding: 15px;
+        font-family: "Cinzel", serif;
+        font-size: 1.1em;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+        transition: background-color 0.3s, border-color 0.3s;
+      }
+
+      .choice-button:hover {
+        background-color: #4d1933;
+        border-color: #ffeb3b;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        background-color: #2e0e1e;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #daa520;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 600px;
+        color: #fdf5e6;
+      }
+
+      #question-text {
+        font-size: 1.2em;
+        margin-bottom: 20px;
+      }
+
+      .options-container div {
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+
+      #submit-answer {
+        background-color: #daa520;
+        color: #4d1933;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Cinzel", serif;
+        font-size: 1em;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>The Midas Touch</h1>
+      <div id="story-container">
+        <img id="chapter-image" src="" alt="Scene from the Tale" />
+        <p id="story-text"></p>
+
+        <div class="controls">
+          <button id="speak-button">Listen to Narration 🔊</button>
+        </div>
+
+        <div id="choices"></div>
+      </div>
+    </div>
+
+    <div id="question-modal" class="modal">
+      <div class="modal-content">
+        <p id="question-text"></p>
+        <div id="options-container" class="options-container"></div>
+        <button id="submit-answer">Submit Answer</button>
+      </div>
+    </div>
+
+    <script>
+      const storyData = {
+        start: {
+          text: "You are Midas, king of Phrygia. One day, your guards bring you Silenus, the elderly teacher of Dionysus, who was found lost in your gardens. Instead of punishing him, you treat him with honor and return him safely to the god of wine. Grateful, Dionysus offers you the fulfillment of any wish. The power to shape your destiny is in your hands. What do you desire?",
+          choices: [
+            {
+              text: "Ask that everything you touch turns into gold.",
+              nextChapter: "path_gold",
+            },
+            {
+              text: "Ask for wisdom to rule with justice and prosperity.",
+              nextChapter: "path_wisdom",
+            },
+          ],
+          question: {
+            prompt: "Which god granted King Midas a wish?",
+            options: ["Zeus", "Apollo", "Hades", "Dionysus"],
+            correctAnswerIndex: 3,
+          },
+        },
+        path_gold: {
+          text: "Dionysus grants your wish with an enigmatic smile. Exultant, you test your new power. You touch a rose, and it becomes solid gold. You touch an apple, and it turns into a cold treasure. You sit down for a banquet to celebrate, but the food and wine turn to metal in your mouth. Horror begins to set in as your beloved daughter runs to hug you. What do you do?",
+          choices: [
+            {
+              text: "Push her away, screaming for her not to touch you.",
+              nextChapter: "path_redemption",
+            },
+            {
+              text: "Forget the curse for a moment and hug her.",
+              nextChapter: "end_tragedy",
+            },
+          ],
+          question: {
+            prompt:
+              "What was the first sign that the golden touch was a curse?",
+            options: [
+              "The flowers lost their scent.",
+              "He could not eat or drink.",
+              "The gold coins were too heavy.",
+              "His throne became uncomfortable.",
+            ],
+            correctAnswerIndex: 1,
+          },
+        },
+        path_wisdom: {
+          text: "Dionysus nods, impressed by your nobility. Your kingdom enters a golden age. The harvests are abundant, trade flourishes, and your people love you. However, the continuous peace and plenty make your soldiers complacent and your people carefree. One day, a neighboring army, envious of your prosperity, marches towards your borders. How do you handle the threat?",
+          choices: [
+            {
+              text: "Trust in wisdom and try a diplomatic solution, offering gold.",
+              nextChapter: "end_hollow",
+            },
+            {
+              text: "Lead your unprepared army into battle, trusting in the people's morale.",
+              nextChapter: "end_fall",
+            },
+          ],
+          question: {
+            prompt:
+              "What was the unintentional consequence of your wish for prosperity?",
+            options: [
+              "The people became arrogant.",
+              "The kingdom became overpopulated.",
+              "The soldiers and the people became complacent.",
+              "The gods became jealous.",
+            ],
+            correctAnswerIndex: 2,
+          },
+        },
+        path_redemption: {
+          text: "Heartbroken, you see the fear in your daughter's eyes. The horror of your power consumes you. You run, desperate, back to the temple of Dionysus and beg for the gift to be removed. Seeing your genuine repentance, the god tells you to wash in the waters of the river Pactolus. You dive into the river, and the golden curse flows away from you, leaving the river's sands gleaming with gold forever. You have learned a hard lesson about what is truly valuable.",
+          choices: [],
+          question: null,
+        },
+        end_tragedy: {
+          text: "In a moment of fatherly love, you hug her. Immediately, she stiffens in your arms, turning into a perfect, lifeless golden statue, a golden tear on her cheek. You have obtained the wealth you desired, but you have lost your only true treasure. You will spend the rest of your days alone in a golden palace, haunted by your mistake. (The End)",
+          choices: [],
+          question: null,
+        },
+        end_hollow: {
+          text: "Your offer of gold is accepted, and the war is averted. Your people hail you as a peaceful savior. However, the news spreads that the prosperous kingdom of Phrygia pays instead of fighting. Other kingdoms and bands of raiders come to demand tribute, slowly bleeding the wealth you wished to protect. Your kingdom is at peace, but it is a purchased peace, and you rule as a treasurer, not a king. (The End)",
+          choices: [],
+          question: null,
+        },
+        end_fall: {
+          text: "Your army, weakened by years of peace and plenty, is no match for the battle-hardened invaders. Your kingdom is conquered, and your wisdom proves useless in the face of brute force. You have learned too late that prosperity without the strength to protect it is not wisdom, but an invitation to disaster. (The End)",
+          choices: [],
+          question: null,
+        },
+      };
+
+      const audioMap = {
+        start: "audio/midas_start.mp3",
+        path_gold: "audio/midas_gold.mp3",
+        path_wisdom: "audio/midas_wisdom.mp3",
+        path_redemption: "audio/midas_redemption_end.mp3",
+        end_tragedy: "audio/midas_tragedy_end.mp3",
+        end_hollow: "audio/midas_hollow_end.mp3",
+        end_fall: "audio/midas_fall_end.mp3",
+      };
+
+      const imageMap = {
+        start: "images/Midas1.jpg",
+        path_gold: "images/Midas2.jpg",
+        path_wisdom: "images/Midas4.jpg",
+        path_redemption: "images/Midas3.jpg",
+        end_tragedy: "images/Midas5.jpg",
+        end_hollow: "images/Midas4.jpg",
+        end_fall: "images/Midas1.jpg",
+      };
+
+      const storyTextElement = document.getElementById("story-text");
+      const choicesElement = document.getElementById("choices");
+      const speakButton = document.getElementById("speak-button");
+      const questionModal = document.getElementById("question-modal");
+      const questionTextElement = document.getElementById("question-text");
+      const optionsContainer = document.getElementById("options-container");
+      const submitAnswerButton = document.getElementById("submit-answer");
+      const imageElement = document.getElementById("chapter-image");
+
+      let currentAudio = new Audio();
+      currentAudio.volume = 0.8;
+
+      let chosenPath = "";
+      let activeChapterKey = "start";
+
+      function renderChapter(chapterKey) {
+        const chapter = storyData[chapterKey];
+        if (!chapter) {
+          console.error("Chapter not found:", chapterKey);
+          return;
+        }
+
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        speakButton.innerText = "Listen to Narration 🔊";
+
+        storyTextElement.innerText = chapter.text;
+        choicesElement.innerHTML = "";
+        imageElement.src = imageMap[chapterKey] || "";
+        imageElement.style.display = imageMap[chapterKey] ? "block" : "none";
+
+        activeChapterKey = chapterKey;
+
+        if (chapter.choices && chapter.choices.length > 0) {
+          chapter.choices.forEach((choice) => {
+            const button = document.createElement("button");
+            button.innerText = choice.text;
+            button.classList.add("choice-button");
+            button.onclick = () => handleChoice(chapterKey, choice.nextChapter);
+            choicesElement.appendChild(button);
+          });
+          speakButton.style.display = "inline-block"; // Mostrar botão
+        } else {
+          // Tela final
+          const restartButton = document.createElement("button");
+          restartButton.innerText = "Restart Story";
+          restartButton.classList.add("choice-button");
+          restartButton.onclick = () => renderChapter("start");
+          choicesElement.appendChild(restartButton);
+          speakButton.style.display = "inline-block"; // Mostrar botão também no final
+        }
+      }
+
+      function handleChoice(chapterKey, nextChapter) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+
+        chosenPath = nextChapter;
+        activeChapterKey = chapterKey;
+        const chapter = storyData[chapterKey];
+        const question = chapter.question;
+
+        if (question) {
+          questionTextElement.innerText = question.prompt;
+          optionsContainer.innerHTML = "";
+          question.options.forEach((option, index) => {
+            optionsContainer.innerHTML += `
+          <div>
+            <input type="radio" id="option${index}" name="answer" value="${index}">
+            <label for="option${index}">${option}</label>
+          </div>
+        `;
+          });
+          questionModal.style.display = "flex";
+        } else {
+          renderChapter(chosenPath);
+        }
+      }
+
+      submitAnswerButton.onclick = () => {
+        const currentQuestion = storyData[activeChapterKey].question;
+        const selectedOption = document.querySelector(
+          'input[name="answer"]:checked'
+        );
+
+        if (!selectedOption) {
+          alert("Please select an answer.");
+          return;
+        }
+
+        if (
+          parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex
+        ) {
+          questionModal.style.display = "none";
+          renderChapter(chosenPath);
+        } else {
+          alert("That does not seem to be the right answer. Try again.");
+        }
+      };
+
+      speakButton.addEventListener("click", () => {
+        const audioFile = audioMap[activeChapterKey];
+        if (audioFile) {
+          if (
+            currentAudio.src.indexOf(audioFile) === -1 ||
+            currentAudio.paused
+          ) {
+            currentAudio.src = audioFile;
+            currentAudio.play();
+            speakButton.innerText = "Pause Narration ⏸️";
+          } else {
+            currentAudio.pause();
+            speakButton.innerText = "Listen to Narration 🔊";
+          }
+        } else {
+          alert(
+            "Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder."
+          );
+        }
+      });
+
+      currentAudio.onended = () => {
+        speakButton.innerText = "Listen to Narration 🔊";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == questionModal) {
+          questionModal.style.display = "none";
+        }
+      };
+
+      renderChapter("start");
+    </script>
+  </body>
+</html>

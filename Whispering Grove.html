@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Whispering Grove - A Mythological Adventure</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+
+    /* CONFIGURAÇÃO DE FUNDO E FONTE */
+    body {
+      font-family: 'Cinzel', serif;
+      background-color: #1a2a1a; /* Verde Escuro Profundo */
+      color: #E0E0E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* CAIXA PRINCIPAL */
+    .container {
+      max-width: 800px;
+      width: 100%;
+      background-color: #2a3a2a; /* Verde Musgo Escuro */
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(173, 255, 47, 0.2); /* Brilho Verde Neon Suave */
+      border: 1px solid #4a5a4a;
+    }
+
+    h1 {
+      color: #ADFF2F; /* Verde Amarelado Brilhante */
+      text-align: center;
+      font-weight: 700;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    #story-text {
+      font-size: 1.1em;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      text-align: justify;
+      color: #dcdcdc;
+    }
+
+    #chapter-image {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ADFF2F;
+    }
+
+    /* CONTROLES DE ÁUDIO (CENTRALIZADO) */
+    .controls {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      margin-bottom: 30px;
+    }
+
+    #speak-button {
+      background-color: #ADFF2F;
+      color: #1a2a1a;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    #speak-button:hover {
+      background-color: #9acd32;
+    }
+
+    #choices {
+      display: grid;
+      gap: 15px;
+    }
+
+    /* BOTÕES DE ESCOLHA */
+    .choice-button {
+      background-color: #3a4a3a;
+      color: #E0E0E0;
+      border: 2px solid #5a6a5a;
+      padding: 15px;
+      font-family: 'Cinzel', serif;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 100%;
+      text-align: left;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .choice-button:hover {
+      background-color: #4a5a4a;
+      border-color: #ADFF2F;
+    }
+
+    /* MODAL (QUIZ) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #2a3a2a;
+      margin: auto;
+      padding: 30px;
+      border: 2px solid #ADFF2F;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      color: #E0E0E0;
+    }
+    
+    #question-text {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      color: #ADFF2F;
+      font-weight: bold;
+    }
+
+    .options-container div {
+      margin-bottom: 10px;
+      cursor: pointer;
+      padding: 10px;
+      background-color: #1a2a1a;
+      border-radius: 5px;
+    }
+    
+    .options-container label {
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    #submit-answer {
+      background-color: #ADFF2F;
+      color: #1a2a1a;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 1em;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    #submit-answer:hover {
+      background-color: #9acd32;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>The Whispering Grove</h1>
+  <div id="story-container">
+    <img id="chapter-image" src="" alt="Scene Image">
+    <p id="story-text"></p>
+    <div class="controls">
+      <button id="speak-button">Listen to Narration 🔊</button>
+    </div>
+    <div id="choices"></div>
+  </div>
+</div>
+
+<div id="question-modal" class="modal">
+  <div class="modal-content">
+    <p id="question-text"></p>
+    <div id="options-container" class="options-container"></div>
+    <button id="submit-answer">Submit Answer</button>
+  </div>
+</div>
+
+<script>
+  const storyData = {
+    'start': {
+      text: "You are Elian, a traveler who has heard tales of the Whispering Grove of Sylva. Legends say the wind through its leaves once shared great wisdom, but for generations, the grove has been silent. You enter the ancient woods, feeling a deep, quiet stillness. Your goal is to awaken its voice. How do you begin?",
+      choices: [
+        { text: "Search for the Heartwood, the legendary eldest tree of the grove.", nextChapter: 'path_heartwood' },
+        { text: "Follow a gentle stream, believing water carries the grove's lifeblood.", nextChapter: 'path_stream' }
+      ],
+      question: {
+        prompt: "What is the main problem Elian is trying to solve in the grove?",
+        options: [
+          "The grove is too dark.",
+          "The grove has been silent for generations.",
+          "The grove is filled with dangerous animals.",
+          "The grove's trees are dying."
+        ],
+        correctAnswerIndex: 1 
+      }
+    },
+    'path_heartwood': {
+      text: "You journey deeper, and soon you find it: the Heartwood. It is a colossal, ancient tree, its bark like wrinkled stone and its branches reaching for the sky like weary arms. It is magnificent, but completely silent. The air around it feels heavy with unspoken words. What do you do to connect with it?",
+      choices: [
+        { text: "Place your hand on its bark, clear your mind, and simply listen.", nextChapter: 'end_success' },
+        { text: "Look for ancient runes or carvings on its trunk.", nextChapter: 'end_neutral' }
+      ],
+      question: {
+        prompt: "What is the name given to the eldest tree in the grove?",
+        options: [
+          "The Spirit Tree",
+          "The Elderwood",
+          "The Heartwood",
+          "The Silent Giant"
+        ],
+        correctAnswerIndex: 2
+      }
+    },
+    'path_stream': {
+      text: "You follow the winding path of a crystal-clear stream. Its gentle babbling is the only sound in the quiet woods. The stream leads you to a sun-dappled clearing where unique, ethereal flowers grow, pulsing with a soft, internal light. You feel the grove's magic is concentrated here. How do you interact with this place?",
+      choices: [
+        { text: "Sit patiently and observe the flowers, noticing their rhythm.", nextChapter: 'end_success' },
+        { text: "Pick one of the glowing flowers, thinking its magic is a key.", nextChapter: 'end_neutral' }
+      ],
+      question: {
+        prompt: "After following the stream, what unique sight does Elian discover?",
+        options: [
+          "A hidden waterfall.",
+          "A small, abandoned shrine.",
+          "A talking animal.",
+          "A clearing with glowing flowers."
+        ],
+        correctAnswerIndex: 3
+      }
+    },
+    'end_neutral': {
+      text: "You try to find a secret or take an object, but your actions yield no results. The grove remains silent. Though you did not hear its voice, you feel a sense of peace from having spent time in this ancient place. You leave with a newfound appreciation for the quiet beauty of nature, even in its silence. (The End)",
+      choices: [],
+      question: null
+    },
+    'end_success': {
+      text: "By acting with patience and a desire to listen, not to take, you feel a change. A gentle hum starts in the air around you. The leaves begin to rustle, and a soft, warm whisper flows through the grove, not in words, but in feelings of peace, growth, and connection. You have restored the grove's voice. (The End)",
+      choices: [],
+      question: null
+    }
+  };
+
+  // --- MAPA DE ÁUDIO ---
+  const audioMap = {
+    'start': 'audio/grove_start.mp3',
+    'path_heartwood': 'audio/grove_heartwood.mp3',
+    'path_stream': 'audio/grove_stream.mp3',
+    'end_success': 'audio/grove_success_end.mp3',
+    'end_neutral': 'audio/grove_neutral_end.mp3'
+  };
+
+  // --- MAPA DE IMAGEM ---
+  const imageMap = {
+    'start': 'images/WG1.jpg',
+    'path_heartwood': 'images/WG2.jpg',
+    'path_stream': 'images/WG4.jpg',
+    'end_success': 'images/WG5.jpg',
+    'end_neutral': 'images/WG3.jpg'
+  };
+
+  const storyTextElement = document.getElementById('story-text');
+  const choicesElement = document.getElementById('choices');
+  const speakButton = document.getElementById('speak-button');
+  const questionModal = document.getElementById('question-modal');
+  const questionTextElement = document.getElementById('question-text');
+  const optionsContainer = document.getElementById('options-container');
+  const submitAnswerButton = document.getElementById('submit-answer');
+  const imageElement = document.getElementById('chapter-image');
+
+  let currentAudio = new Audio();
+  currentAudio.volume = 0.8;
+  let activeChapterKey = 'start';
+
+  function renderChapter(chapterKey) {
+    const chapter = storyData[chapterKey];
+    if (!chapter) return;
+
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    speakButton.innerText = 'Listen to Narration 🔊';
+
+    storyTextElement.innerText = chapter.text;
+    choicesElement.innerHTML = '';
+    
+    const imagePath = imageMap[chapterKey];
+    if (imagePath) {
+      imageElement.src = imagePath;
+      imageElement.style.display = 'block';
+    } else {
+      imageElement.style.display = 'none';
+    }
+
+    activeChapterKey = chapterKey;
+
+    if (chapter.choices && chapter.choices.length > 0) {
+      chapter.choices.forEach(choice => {
+        const button = document.createElement('button');
+        button.innerText = choice.text;
+        button.classList.add('choice-button');
+        button.onclick = () => handleChoice(choice.nextChapter);
+        choicesElement.appendChild(button);
+      });
+      speakButton.style.display = 'inline-block';
+    } else {
+      const restartButton = document.createElement('button');
+      restartButton.innerText = 'Restart';
+      restartButton.classList.add('choice-button');
+      restartButton.onclick = () => renderChapter('start');
+      choicesElement.appendChild(restartButton);
+      speakButton.style.display = 'inline-block';
+    }
+  }
+
+  function handleChoice(nextChap) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    
+    const nextChapter = nextChap;
+    const chapter = storyData[activeChapterKey];
+    const question = chapter.question;
+
+    if (question) {
+      questionTextElement.innerText = question.prompt;
+      optionsContainer.innerHTML = '';
+      question.options.forEach((option, index) => {
+        optionsContainer.innerHTML += `
+          <div>
+            <input type="radio" id="option${index}" name="answer" value="${index}">
+            <label for="option${index}">${option}</label>
+          </div>
+        `;
+      });
+      
+      submitAnswerButton.dataset.next = nextChapter;
+      questionModal.style.display = 'flex';
+    } else {
+      renderChapter(nextChapter);
+    }
+  }
+
+  submitAnswerButton.onclick = () => {
+    const currentQuestion = storyData[activeChapterKey].question;
+    const selectedOption = document.querySelector('input[name="answer"]:checked');
+    const nextChapter = submitAnswerButton.dataset.next;
+
+    if (!selectedOption) {
+      alert('Please select an answer.');
+      return;
+    }
+
+    if (parseInt(selectedOption.value) === currentQuestion.correctAnswerIndex) {
+      questionModal.style.display = 'none';
+      renderChapter(nextChapter);
+    } else {
+      alert('Incorrect answer. Please try again.');
+      questionModal.style.display = 'none';
+    }
+  };
+
+  speakButton.addEventListener('click', () => {
+    const audioFile = audioMap[activeChapterKey];
+    if (audioFile) {
+      if (currentAudio.src.indexOf(audioFile) === -1 || currentAudio.paused) {
+        currentAudio.src = audioFile;
+        currentAudio.play();
+        speakButton.innerText = 'Pause Narration ⏸️';
+      } else {
+        currentAudio.pause();
+        speakButton.innerText = 'Listen to Narration 🔊';
+      }
+    } else {
+      alert('Audio file not found for this chapter. Please ensure the MP3 is in the audio/ folder.');
+    }
+  });
+
+  currentAudio.onended = () => {
+    speakButton.innerText = 'Listen to Narration 🔊';
+  };
+
+  window.onclick = function(event) {
+    if (event.target == questionModal) {
+      questionModal.style.display = "none";
+    }
+  }
+
+  // Start the story
+  renderChapter('start');
+</script>
+</body>
+</html>
