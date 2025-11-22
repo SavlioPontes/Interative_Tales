@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interactive Tales</title>
+    <title>Interactive Tales - Main Menu</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap"
       rel="stylesheet"
@@ -19,6 +19,20 @@
       body {
         font-family: "Cinzel", serif;
         background-color: var(--dark-background);
+
+        /* --- CONFIGURAÇÃO DA IMAGEM DE FUNDO --- */
+        /* Certifique-se que styx.jpg está na pasta images */
+        background-image: linear-gradient(
+            rgba(0, 0, 0, 0.6),
+            rgba(0, 0, 0, 0.6)
+          ),
+          url("images/styx.jpg");
+        background-size: cover; /* Cobre a tela toda */
+        background-position: center; /* Centraliza */
+        background-attachment: fixed; /* Fixo ao rolar */
+        background-repeat: no-repeat;
+        /* --------------------------------------- */
+
         color: var(--text-color);
         line-height: 1.6;
         margin: 0;
@@ -28,36 +42,39 @@
         flex-direction: column;
         align-items: center;
         padding: 40px 20px;
+        box-sizing: border-box;
       }
 
       header {
         text-align: center;
-        padding: 60px 0;
+        padding: 40px 0;
       }
 
       h1 {
-        font-size: 3.5em;
+        font-size: 3em;
         font-weight: 900;
         color: var(--gold-light);
         text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
         border-bottom: 3px solid var(--gold-accent);
         padding-bottom: 10px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
       }
 
       p.subtitle {
         font-size: 1.2em;
-        margin-top: -10px;
+        margin-top: 10px;
         color: #ccc;
+        font-style: italic;
       }
 
       .container {
         max-width: 900px;
         width: 100%;
-        background-color: #2a2a2a;
+        /* Deixei mais transparente (0.9) para ver o fundo styx.jpg */
+        background-color: rgba(42, 42, 42, 0.9);
         border-radius: 10px;
-        padding: 30px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        padding: 40px;
+        box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
         margin-bottom: 30px;
         border: 1px solid #444;
       }
@@ -74,7 +91,7 @@
         font-family: "Cinzel", serif;
         font-size: 1.8em;
         font-weight: 700;
-        padding: 15px 40px;
+        padding: 15px 50px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -97,6 +114,20 @@
         padding-bottom: 5px;
         margin-bottom: 20px;
         font-weight: 700;
+        margin-top: 0;
+      }
+
+      /* CREDITS */
+      .credit-item {
+        margin-bottom: 12px;
+        border-bottom: 1px solid #333;
+        padding-bottom: 8px;
+      }
+      .credit-title {
+        font-weight: 700;
+        color: var(--gold-accent);
+        display: block;
+        margin-bottom: 4px;
       }
 
       /* STORY LIST */
@@ -105,7 +136,7 @@
         padding: 0;
         margin-top: 20px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 15px;
       }
 
@@ -114,17 +145,19 @@
         border-left: 5px solid var(--gold-accent);
         padding: 15px;
         border-radius: 5px;
-        transition: background 0.3s;
+        transition: background 0.3s, transform 0.2s;
       }
 
       #storyList li:hover {
         background: #444;
+        transform: translateX(5px);
       }
 
       #storyList a {
         text-decoration: none;
         color: var(--text-color);
-        font-weight: 400;
+        font-weight: 700;
+        font-size: 1.1em;
         display: block;
       }
 
@@ -132,16 +165,7 @@
         color: var(--gold-light);
       }
 
-      .credit-item {
-        margin-bottom: 10px;
-      }
-      .credit-title {
-        font-weight: 700;
-        color: var(--gold-accent);
-        display: block;
-      }
-
-      /* Hidden initially, shown after click */
+      /* Hidden initially */
       .hidden {
         display: none;
       }
@@ -162,21 +186,21 @@
         <h2 class="section-title">HOW IT WORKS</h2>
         <p>
           This is a collection of interactive, text-based adventures. Read the
-          story and make choices when prompted. Some chapters may include
-          quizzes to test your understanding before proceeding.
+          story, listen to the narration, and make choices to shape the hero's
+          fate. Some chapters include quizzes to test your knowledge.
         </p>
-        <p>
+        <p style="margin-top: 10px">
           <strong>Note:</strong> Each story is self-contained. You can explore
           them in any order.
         </p>
       </section>
 
-      <section style="margin-top: 30px">
+      <section style="margin-top: 40px">
         <h2 class="section-title">CREDITS</h2>
 
         <div class="credit-item">
-          <span class="credit-title">Extension Project:</span> Tecnologia em
-          Educação na CCB
+          <span class="credit-title">Extension Project:</span>
+          Tecnologia em Educação na CCB
         </div>
         <div class="credit-item">
           <span class="credit-title">Concept, Corrections and Ideas:</span>
@@ -184,41 +208,43 @@
         </div>
         <div class="credit-item">
           <span class="credit-title"
-            >Story, Primary Development and Image Assets:</span
+            >Story, Primary Development & Image Assets:</span
           >
           Felipe Bomfim Teles
         </div>
         <div class="credit-item">
           <span class="credit-title"
-            >Second Development, Deployment and Audio Assets:</span
+            >Secondary Development, Deployment & Audio Assets:</span
           >
           Savlio Carvalho Pontes
         </div>
         <div class="credit-item">
-          <span class="credit-title">Technologies Used:</span> HTML, CSS, and
-          JavaScript
+          <span class="credit-title">Technologies Used:</span>
+          HTML, CSS, and JavaScript
         </div>
       </section>
 
       <section
         class="hidden"
         id="storySelectionSection"
-        style="margin-top: 30px"
+        style="margin-top: 40px; border-top: 2px solid #444; padding-top: 30px"
       >
         <h2 class="section-title">CHOOSE A TALE</h2>
         <ul id="storyList">
           <li>
-            <a href="Abduction of Persephone.html">Abduction of Persephone</a>
+            <a href="Abduction of Persephone.html"
+              >The Abduction of Persephone</a
+            >
           </li>
-          <li><a href="Lyre of Souls.html">Lyre of Souls</a></li>
-          <li><a href="Midas.html">Midas</a></li>
-          <li><a href="Serpent's Coil.html">Serpent's Coil</a></li>
-          <li><a href="Serpent's Tooth.html">Serpent's Tooth</a></li>
-          <li><a href="Thread of Pride.html">Thread of Pride</a></li>
-          <li><a href="Unworthy Hammer.html">Unworthy Hammer</a></li>
-          <li><a href="Valkyrie's Whisper.html">Valkyrie's Whisper</a></li>
-          <li><a href="Whispering Grove.html">Whispering Grove</a></li>
-          <li><a href="Labyrinth's Shadow.html">Labyrinth's Shadow</a></li>
+          <li><a href="Lyre of Souls.html">The Lyre of Souls</a></li>
+          <li><a href="Midas.html">The Midas Touch</a></li>
+          <li><a href="Serpent's Coil.html">The Serpent's Coil</a></li>
+          <li><a href="Serpent's Tooth.html">The Serpent's Tooth</a></li>
+          <li><a href="Thread of Pride.html">The Thread of Pride</a></li>
+          <li><a href="Unworthy Hammer.html">The Unworthy Hammer</a></li>
+          <li><a href="Valkyrie's Whisper.html">The Valkyrie's Whisper</a></li>
+          <li><a href="Whispering Grove.html">The Whispering Grove</a></li>
+          <li><a href="Labyrinth's Shadow.html">The Labyrinth's Shadow</a></li>
         </ul>
       </section>
     </div>
@@ -234,9 +260,13 @@
           selection.classList.remove("hidden");
 
           // 2. Mudar o texto do botão
-          button.innerText = "CHOOSE A TALE";
+          button.innerText = "CHOOSE A TALE BELOW";
 
-          // 3. Scroll suave até a lista
+          // 3. Desabilitar o botão para não clicar de novo
+          button.style.cursor = "default";
+          button.style.opacity = "0.7";
+
+          // 4. Scroll suave até a lista
           selection.scrollIntoView({ behavior: "smooth" });
         });
     </script>
