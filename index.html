@@ -11,8 +11,8 @@
     <style>
       :root {
         --dark-background: #1c1c1c;
-        --text-color: #fdf5e6; /* Parchment White */
-        --gold-accent: #daa520; /* Goldenrod */
+        --text-color: #fdf5e6; 
+        --gold-accent: #daa520; 
         --gold-light: #ffd700;
       }
 
@@ -20,18 +20,15 @@
         font-family: "Cinzel", serif;
         background-color: var(--dark-background);
 
-        /* --- CONFIGURAÇÃO DA IMAGEM DE FUNDO --- */
-        /* Certifique-se que styx.jpg está na pasta images */
         background-image: linear-gradient(
             rgba(0, 0, 0, 0.6),
             rgba(0, 0, 0, 0.6)
           ),
           url("images/styx.jpg");
-        background-size: cover; /* Cobre a tela toda */
-        background-position: center; /* Centraliza */
-        background-attachment: fixed; /* Fixo ao rolar */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
         background-repeat: no-repeat;
-        /* --------------------------------------- */
 
         color: var(--text-color);
         line-height: 1.6;
@@ -70,7 +67,6 @@
       .container {
         max-width: 900px;
         width: 100%;
-        /* Deixei mais transparente (0.9) para ver o fundo styx.jpg */
         background-color: rgba(42, 42, 42, 0.9);
         border-radius: 10px;
         padding: 40px;
@@ -79,7 +75,6 @@
         border: 1px solid #444;
       }
 
-      /* START BUTTON */
       .start-button-area {
         text-align: center;
         margin-bottom: 40px;
@@ -106,7 +101,6 @@
         transform: scale(1.05);
       }
 
-      /* SECTION STYLES */
       .section-title {
         font-size: 1.8em;
         color: var(--gold-light);
@@ -117,7 +111,6 @@
         margin-top: 0;
       }
 
-      /* CREDITS */
       .credit-item {
         margin-bottom: 12px;
         border-bottom: 1px solid #333;
@@ -130,7 +123,6 @@
         margin-bottom: 4px;
       }
 
-      /* STORY LIST */
       #storyList {
         list-style: none;
         padding: 0;
@@ -165,12 +157,12 @@
         color: var(--gold-light);
       }
 
-      /* Hidden initially */
       .hidden {
         display: none;
       }
     </style>
   </head>
+
   <body>
     <header>
       <h1>INTERACTIVE TALES</h1>
@@ -202,22 +194,27 @@
           <span class="credit-title">Extension Project:</span>
           Tecnologia em Educação na CCB
         </div>
+
         <div class="credit-item">
-          <span class="credit-title">Concept, Corrections and Ideas:</span>
+          <span class="credit-title">Corrections:</span>
           Prof. Francisco Tarcizio Cavalcante Benevides Junior
         </div>
+
         <div class="credit-item">
-          <span class="credit-title"
-            >Story, Primary Development & Image Assets:</span
-          >
+          <span class="credit-title">Idea & Concept:</span>
+          Samuel Nivolau Alves Ribeiro da Silva
+        </div>
+
+        <div class="credit-item">
+          <span class="credit-title">Story, Primary Development & Image Assets:</span>
           Felipe Bomfim Teles
         </div>
+
         <div class="credit-item">
-          <span class="credit-title"
-            >Secondary Development, Deployment & Audio Assets:</span
-          >
+          <span class="credit-title">Secondary Development, Deployment & Audio Assets:</span>
           Savlio Carvalho Pontes
         </div>
+
         <div class="credit-item">
           <span class="credit-title">Technologies Used:</span>
           HTML, CSS, and JavaScript
@@ -233,8 +230,7 @@
         <ul id="storyList">
           <li>
             <a href="Abduction of Persephone.html"
-              >The Abduction of Persephone</a
-            >
+              >The Abduction of Persephone</a>
           </li>
           <li><a href="Lyre of Souls.html">The Lyre of Souls</a></li>
           <li><a href="Midas.html">The Midas Touch</a></li>
@@ -256,17 +252,10 @@
           const selection = document.getElementById("storySelectionSection");
           const button = document.getElementById("startButton");
 
-          // 1. Mostrar a lista de histórias
           selection.classList.remove("hidden");
-
-          // 2. Mudar o texto do botão
           button.innerText = "CHOOSE A TALE BELOW";
-
-          // 3. Desabilitar o botão para não clicar de novo
           button.style.cursor = "default";
           button.style.opacity = "0.7";
-
-          // 4. Scroll suave até a lista
           selection.scrollIntoView({ behavior: "smooth" });
         });
     </script>
